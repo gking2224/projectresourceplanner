@@ -1,0 +1,34 @@
+
+div {
+  &.context-menu-wrapper {
+    display: inline;
+  }
+  &.context-menu {
+    position: absolute;
+    border: 1px solid #c9c9c9;
+    border-radius: 5px;
+    box-shadow: 3px 3px 20px lightgrey;
+    background-color: #ebebeb;
+    ul {
+      padding: 0.25em 0;
+      margin: 0;
+      //clear: right;
+    }
+    li {
+      list-style: none;
+      display: block;
+      padding: 0.25em 1em;
+      &:hover {
+        background-color: lightgrey;
+      }
+      cursor: pointer;
+    }
+    span.close-control {
+      display: block;
+      overflow: auto;
+      a {
+        float: right;
+      }
+    }
+  }
+}

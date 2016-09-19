@@ -1,0 +1,98 @@
+$lightgrey: #d2d2d2;
+$midgrey: #a8a8a8;
+$darkgrey: #616161;
+$warningred: rgba(139, 11, 17, 0.79);
+$highlightYello: rgba(235, 209, 46, 0.66);
+
+@mixin tableborder {
+  border: 1px solid $darkgrey;
+}
+
+@mixin total {
+  font-weight: bold;
+}
+
+
+#budgets-ctr {
+  p {
+    label {
+      width: 20em;
+    }
+  }
+  table {
+    border-collapse: collapse;
+    th {
+      background-color: $darkgrey;
+    }
+    td,th {
+      //padding: 0.25em 0.5em
+      @include tableborder;
+      &.total {
+        @include total;
+      }
+      &.fte, &.rate {
+        input,span {
+          width: 2em
+        }
+        text-align: center;
+      }
+      &.fte.over {
+        background-color: $warningred;
+      }
+      &.over {
+        background-color: $warningred;
+      }
+
+    }
+    thead {
+      tr {
+        @include tableborder;
+        &#filters {
+          border: none;
+          background-color: inherit;
+          th {
+            background-color: inherit;
+            border: none;
+          }
+        }
+      }
+    }
+    tr {
+      &.even {
+        background-color: white
+      }
+      &.odd {
+        background-color: $lightgrey;
+      }
+      &.total td {
+        @include total;
+      }
+      &.role {
+        background-color: $midgrey;
+      }
+      &.allocation {
+        span.highlight {
+          background-color: $highlightYello;
+        }
+      }
+    }
+  }
+  #budget-summary-ctr {
+    span.over {
+      background-color: $warningred;
+    }
+  }
+}
+
+div#resource-summary {
+  td {
+    border: 1px solid black
+  }
+}
+
+span.editableInput, span.editableDropdown {
+  cursor: default;
+  &.editable {
+    cursor: pointer
+  }
+}

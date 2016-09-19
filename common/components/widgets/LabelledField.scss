@@ -1,0 +1,16 @@
+div.labelled-field {
+  label {
+    padding-right: 2em;
+    font-weight: bold;
+    display: inline-block;
+    &.small {
+      width: 4em;
+    }
+    &.medium {
+      width: 8em;
+    }
+    &.large {
+      width: 14em;
+    }
+  }
+}
