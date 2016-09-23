@@ -1,6 +1,8 @@
+/* eslint import/no-named-as-default: "off" */
+
 import 'babel-polyfill'
 import React from 'react'
-import { Router, Route, browserHistory, hashHistory, IndexRoute } from 'react-router'
+import { Router, Route, browserHistory, IndexRoute } from 'react-router'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 
@@ -13,7 +15,6 @@ import Project from '../common/components/project/Project'
 import ProjectList from '../common/components/project/ProjectList'
 import Budget from '../common/components/budget/Budget'
 import Budgets from '../common/containers/Budgets'
-import ResourceProjectSummary from '../common/components/budget/ResourceProjectSummary'
 
 getInitialState().then(state => {
 

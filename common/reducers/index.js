@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux'
-import projects from './projects'
 import sessionInfo from './sessionInfo'
 import model from './model'
 import staticRefData from './staticRefData'

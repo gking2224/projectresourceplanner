@@ -5,18 +5,18 @@ import BudgetListItem from './BudgetListItem'
 import { Utils } from '../../utils'
 import { Permissions } from '../../constants'
 
-const ProjectBudgetList = ({budgets, toggleDefault, addNewBudget, sessionInfo}) => {
+const ProjectBudgetList = ({ budgets, toggleDefault, addNewBudget }, { getSessionInfo }) => {
 
   return (
     <div id="project-budget-summary">
       <h2>Budgets</h2>
-      {budgetsByYear(budgets, toggleDefault, addNewBudget, sessionInfo)}
+      {budgetsByYear(budgets, toggleDefault, addNewBudget, getSessionInfo() )}
     </div>
   )
 }
 
 const budgetsByYear = (budgets = [], toggleDefault, addNewBudget, sessionInfo) => {
-  const years = [...new Set(budgets.map(b => b.year))].sort().map(n => new Number(n))
+  const years = [...new Set(budgets.map(b => b.year))].sort().map(n => new Number(n).valueOf())
 
   const additionalYear = (years.length > 0) ? years[years.length - 1] + 1 : 2016
   return (
@@ -52,5 +52,9 @@ const renderAddButton = (year, addNewBudget) => {
   return (
     <button onClick={addNewBudget(year)}>New Budget</button>
   )
+}
+
+ProjectBudgetList.contextTypes = {
+  getSessionInfo: PropTypes.func,
 }
 export { ProjectBudgetList }

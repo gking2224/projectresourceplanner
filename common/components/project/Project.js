@@ -15,7 +15,8 @@ const Project = React.createClass({
   },
 
   contextTypes: {
-    router: PropTypes.object
+    router: PropTypes.object,
+    sessionInfo: PropTypes.object
   },
 
   componentDidMount: function() {
@@ -35,7 +36,8 @@ const Project = React.createClass({
   },
 
   renderProject: function() {
-    const { project, budgets, sessionInfo } = this.props
+    const { project, budgets } = this.props
+    const { sessionInfo } = this.context
     return (
       <div id="project-detail">
         <h2>{project.name}</h2>
@@ -50,7 +52,6 @@ const Project = React.createClass({
   lazyLoadBudgets: function() {
     const { project } = this.props
 
-    console.log()
     if (!this.props.budgets || this.state.reloadBudgets) this.props.loadBudgets(project._id)
     this.setState({reloadBudgets: false})
   },
@@ -67,7 +68,7 @@ const Project = React.createClass({
   toggleDefaultBudget: function(year, yearBudgets) {
     return (b) => {
       return () => {
-        const { setDefault, userWarning, saveBudget } = this.props
+        const { userWarning, saveBudget } = this.props
         if (b.isDefault) {
           // try to unset
           userWarning("There must be one default budget per year")
@@ -96,14 +97,13 @@ export default connect(
     project: (state.model.projects.activeProjectId) ?
       state.model.projects.projectList.find(p => p._id === state.model.projects.activeProjectId) :
       null,
-    budgets: state.model.budgets.budgetList,
-    sessionInfo: state.sessionInfo
+    budgets: state.model.budgets.budgetList
   }),
   dispatch => ({
     saveBudget: (budget) => dispatch(BudgetActions.saveBudget(budget)),
     loadProject: projectId => dispatch(ProjectActions.loadProject(projectId)),
     loadBudgets: (projectId) => dispatch(BudgetActions.loadProjectBudgets(projectId)),
-    setDefault: (budget, isDefault) => dispatch(BudgetActions.setDefault({budgetId, isDefault})),
+    // setDefault: (budget, isDefault) => dispatch(BudgetActions.setDefault({budgetId, isDefault})),
     userWarning: (message) => dispatch(GlobalActions.userWarning(message))
   })
 )(Project)

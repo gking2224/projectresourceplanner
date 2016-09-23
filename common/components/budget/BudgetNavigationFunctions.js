@@ -18,20 +18,15 @@ export const NavHelper = {
 
   editPreviousFteCell: function(month, type, allocationIdx) {
     if (month > 0)
-      this.setState({editingMonth: --month, editingType: type, editingAllocationIdx: allocationIdx},
-        this.forceUpdate)
+      this.setState({editingMonth: --month, editingType: type, editingAllocationIdx: allocationIdx})
     else if (type === 'forecast' && allocationIdx == 0)
-      this.setState({editingMonth: 11, editingType: 'fte', editingAllocationIdx: null},
-        this.forceUpdate)
+      this.setState({editingMonth: 11, editingType: 'fte', editingAllocationIdx: null})
     else if (type === 'forecast' && allocationIdx > 0)
-      this.setState({editingMonth: 11, editingType: 'actuals', editingAllocationIdx: --allocationIdx},
-        this.forceUpdate)
+      this.setState({editingMonth: 11, editingType: 'actuals', editingAllocationIdx: --allocationIdx})
     else if (type === 'actuals')
-      this.setState({editingMonth: 11, editingType: 'forecast', editingAllocationIdx: allocationIdx},
-        this.forceUpdate)
+      this.setState({editingMonth: 11, editingType: 'forecast', editingAllocationIdx: allocationIdx})
     else {
-      this.setState({editingMonth: null, editingType: null, editingAllocationIdx: null},
-        this.forceUpdate)
+      this.setState({editingMonth: null, editingType: null, editingAllocationIdx: null})
       this.props.focusPreviousRole()
     }
   },
@@ -39,43 +34,36 @@ export const NavHelper = {
   editUpRow: function(month, type, allocationIdx) {
     if (type == 'actuals') this.setState({editingType: 'forecast'}, this.forceUpdate)
     else if (type == 'forecast' && allocationIdx  > 0)
-      this.setState({editingType: 'actuals', editingAllocationIdx: --allocationIdx}, this.forceUpdate)
+      this.setState({editingType: 'actuals', editingAllocationIdx: --allocationIdx})
     else if (type === 'forecast')
-      this.setState({editingType: 'fte', editingAllocationIdx: null},
-        this.forceUpdate)
+      this.setState({editingType: 'fte', editingAllocationIdx: null})
     else {
-      this.setState({editingMonth: null, editingType: null, editingAllocationIdx: null},
-        this.forceUpdate)
+      this.setState({editingMonth: null, editingType: null, editingAllocationIdx: null})
       this.props.focusPreviousRole()
     }
   },
 
   editDownRow: function(month, type, allocationIdx) {
-    if (type == 'forecast') this.setState({editingType: 'actuals'}, this.forceUpdate)
+    if (type == 'forecast') this.setState({editingType: 'actuals'})
     else if (type === 'fte' && this.state.viewAllocations && this.state.role.resourceAllocations.length > 0)
-      this.setState({editingType: 'forecast', editingAllocationIdx: 0}, this.forceUpdate)
+      this.setState({editingType: 'forecast', editingAllocationIdx: 0})
     else if (type === 'actuals' && this.state.role.resourceAllocations.length > (allocationIdx+1))
-      this.setState({editingType: 'forecast', editingAllocationIdx: ++allocationIdx}, this.forceUpdate)
+      this.setState({editingType: 'forecast', editingAllocationIdx: ++allocationIdx})
     else {
-      this.setState({editingMonth: null, editingType: null, editingAllocationIdx: null},
-        this.forceUpdate)
+      this.setState({editingMonth: null, editingType: null, editingAllocationIdx: null})
       this.props.focusNextRole()
     }
   },
 
   editNextFteCell: function(month, type, allocationIdx) {
     if (month < 11)
-      this.setState({editingMonth: (month + 1), editingType: type, editingAllocationIdx: allocationIdx},
-        this.forceUpdate)
+      this.setState({editingMonth: (month + 1), editingType: type, editingAllocationIdx: allocationIdx})
     else if (type === 'fte' && this.state.viewAllocations && this.state.role.resourceAllocations.length > 0)
-      this.setState({editingMonth: 0, editingType: 'forecast', editingAllocationIdx: 0},
-        this.forceUpdate)
+      this.setState({editingMonth: 0, editingType: 'forecast', editingAllocationIdx: 0})
     else if (type === 'forecast')
-      this.setState({editingMonth: 0, editingType: 'actuals', editingAllocationIdx: allocationIdx},
-        this.forceUpdate)
+      this.setState({editingMonth: 0, editingType: 'actuals', editingAllocationIdx: allocationIdx})
     else {
-      this.setState({editingMonth: null, editingType: null, editingAllocationIdx: null},
-        this.forceUpdate)
+      this.setState({editingMonth: null, editingType: null, editingAllocationIdx: null})
       this.props.focusNextRole()
     }
   },
@@ -83,7 +71,7 @@ export const NavHelper = {
   cancelEditFteCell: function(month, type, allocationIdx) {
     if (NavHelper.isEditingFteCell.bind(this, month, type, allocationIdx)())
       this.setState(
-        {editingMonth: null, editingType: null, editingAllocationIdx: null}, this.forceUpdate)
+        {editingMonth: null, editingType: null, editingAllocationIdx: null})
   },
 
   onChangeFteCell: function(month, type, allocationIdx, val) {

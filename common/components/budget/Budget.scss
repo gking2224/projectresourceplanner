@@ -69,6 +69,11 @@ $highlightYello: rgba(235, 209, 46, 0.66);
       }
       &.role {
         background-color: $midgrey;
+        td.roleName {
+          button {
+            float: left;
+          }
+        }
       }
       &.allocation {
         span.highlight {
@@ -76,6 +81,17 @@ $highlightYello: rgba(235, 209, 46, 0.66);
         }
       }
     }
+  }
+  #budget-roles {
+    span.editableInput, span.editableDropdown {
+      cursor: default;
+      display: block;
+      overflow: hidden;
+      &.editable {
+        cursor: pointer
+      }
+    }
+
   }
   #budget-summary-ctr {
     span.over {
@@ -87,12 +103,5 @@ $highlightYello: rgba(235, 209, 46, 0.66);
 div#resource-summary {
   td {
     border: 1px solid black
-  }
-}
-
-span.editableInput, span.editableDropdown {
-  cursor: default;
-  &.editable {
-    cursor: pointer
   }
 }

@@ -1,9 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import pd from 'react-prevent-default'
 import keycode from 'keycode'
 import classNames from 'classnames'
-import mouse from 'mouse-event'
 
 export const EditableInput = React.createClass({
 
@@ -14,7 +12,8 @@ export const EditableInput = React.createClass({
       immediateFire: false,
       allowInlineEdit: true,
       blankEditHandle: '-',
-      initialReadonly: true
+      initialReadonly: true,
+      initialContent: '',
     }
   },
 
@@ -38,9 +37,13 @@ export const EditableInput = React.createClass({
 
   componentWillReceiveProps: function(nextProps) {
     this.setState({
-      content: nextProps.initialContent,
+      content: nextProps.initialContent || '',
       readonly: nextProps.initialReadonly
     })
+  },
+
+  componentDidMount: function() {
+    if (this.props.onMount) this.props.onMount(this)
   },
 
   render: function() {
@@ -50,26 +53,45 @@ export const EditableInput = React.createClass({
     if (readonly) {
       let label = (content) ? content : ((allowInlineEdit) ? blankEditHandle : '')
       return (
-        <span onMouseUp={this.onMouseUpHandler} className={classNames(className, 'editableInput', {'editable': allowInlineEdit})}>{label}</span>
+        <span onMouseUp={this.onMouseUpHandler}
+              className={classNames(className, 'editableInput', {editable: allowInlineEdit})}
+        >
+          {label}
+        </span>
       )
     }
     else {
+      const inputProps = {}
+      if (onChange) inputProps.value = content
+      else inputProps.defaultValue = content
       return (
         <input ref={n => {
           this.input = n
         }}
+               {...inputProps}
                className={classNames(className, 'editableInput')}
-               defaultValue={content}
                onBlur={this.onBlurHandler}
                onKeyUp={this.onKeyUpHandler}
-               onChange={(!onChange)?null:this.onChangeHandler}
+               onChange={this.onChangeHandler}
                onKeyDown={this.onKeyDownHandler}
         />
       )
     }
   },
 
-  onChangeHandler: function() {
+  focus: function() {
+    const { readonly } = this.state
+    if (!readonly) this.input.focus()
+  },
+
+  select: function() {
+    const { readonly } = this.state
+    if (!readonly) this.input.select()
+  },
+
+  onChangeHandler: function(e) {
+    this.input.value = e.target.value
+    // if (this.props.onChange || this.props.onComplete)
     this.fireChange(false)
   },
 
@@ -127,23 +149,19 @@ export const EditableInput = React.createClass({
     else if (keycode(e) === 'esc') {
       this.fullReset()
     }
-    else if (keycode(e) === 'down') {
-      this.fireExitFunction(e, this.props.onDown)
-    }
     else if (keycode(e) === 'up') {
-      this.fireExitFunction(e, this.props.onUp)
+      this.fireExitFunction(e,
+        (e.shiftKey) ? this.props.onShiftUp : (e.altKey) ? this.props.onAltUp : this.props.onUp)
+    }
+    else if (keycode(e) === 'down') {
+      this.fireExitFunction(e,
+        (e.shiftKey) ? this.props.onShiftDown : (e.altKey) ? this.props.onAltDown : this.props.onDown)
     }
     else if (keycode(e) === 'right' && e.altKey) {
       this.fireExitFunction(e, this.props.onAltRight)
     }
     else if (keycode(e) === 'left' && e.altKey) {
       this.fireExitFunction(e, this.props.onAltLeft)
-    }
-    else if (keycode(e) === 'down' && e.altKey) {
-      this.fireExitFunction(e, this.props.onAltDown)
-    }
-    else if (keycode(e) === 'up' && e.altKey) {
-      this.fireExitFunction(e, this.props.onAltUp)
     }
     else if (this.props.immediateFire) {
       this.fireChange(false)
@@ -180,17 +198,18 @@ export const EditableInput = React.createClass({
   },
 
   fullReset: function() {
-    if (this.props.cancelEdit) {
-      this.props.cancelEdit()
+    if (this.props.requestEdit) {
+      if (this.props.cancelEdit) this.props.cancelEdit() // cancel edit should update value and readonly attributes
     }
     else {
-      this.setState({content: this.props.initialContent})
+      this.setState({readonly: this.props.initialReadonly, content: this.props.initialContent})
+      if (this.props.finishEdit) this.props.finishEdit()
     }
   },
 
   resetReadonly: function() {
-    if (this.props.cancelEdit) {
-      this.props.cancelEdit()
+    if (this.props.requestEdit) {
+      if (this.props.finishEdit) this.props.finishEdit() // should finish edit be expected to reset readonly? maybe only if requestEdit is not set...
     }
     else {
       this.setState({readonly: this.props.initialReadonly})
@@ -199,7 +218,7 @@ export const EditableInput = React.createClass({
 
   suppressContext: function() {
     return !this.state.readonly
-  }
+  },
 
 })
 

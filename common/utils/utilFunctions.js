@@ -2,6 +2,10 @@ import React from 'react'
 import { GlobalActions } from '../actions'
 
 export const Utils = {
+  months: () => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+
+  month_Indices: () => Utils.months().map( (m, idx) => idx),
+
   ifPermissioned: (sessionInfo, permission, positive, negative) => {
     if (Utils.hasPermission(sessionInfo, permission)) {
       return Utils.doIt(positive)
@@ -10,16 +14,16 @@ export const Utils = {
       return (negative) ? Utils.doIt(negative) : <span className={"missingPermission missingPermission_" + permission}></span>
     }
   },
+
   hasPermission: (sessionInfo, permission) => {
     return (sessionInfo && sessionInfo.permissions && sessionInfo.permissions.indexOf(permission) !== -1)
   },
-  hasAllPermissions: (sessionInfo, permissions,) => {
 
+  hasAllPermissions: (sessionInfo, permissions) => {
     return permission.reduce( (b, p) => b && Utils.hasPermission(sessionInfo, p), true)
   },
 
-  hasOnePermissions: (sessionInfo, permissions,) => {
-
+  hasAtLeastOnePermission: (sessionInfo, permissions,) => {
     return permission.reduce( (b, p) => b || Utils.hasPermission(sessionInfo, p), false)
   },
 
@@ -45,13 +49,6 @@ export const Utils = {
         if (errorAC) dispatch(errorAC(e))
       })
     }
-  },
-
-  resourceById: (id, resources) => {
-    return resources.find((r) => r._id === id)
-  },
-
-  resourceName: (resource) => {
-    return (resource) ? resource.firstName + ' ' + resource.surname : null
   }
+
 }

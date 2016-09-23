@@ -1,4 +1,4 @@
 export * from './budgetActions'
-export * from './projectActions'
+export { default as ProjectActions } from './projectActions'
 export * from './globalActions'
-export * from './menuActions'
+export { default as MenuActions } from './menuActions'

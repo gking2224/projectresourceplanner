@@ -4,8 +4,8 @@ import { ContextMenuWrapper, EditableInput } from '../widgets'
 import classNames from 'classnames'
 
 export const FteCell = ({
-    fte, rate, edit, editNext, editPrevious, editDown, editUp, className,
-    isEditing, cancelEdit, onChange, fillRight, fillLeft, viewFteValue, split
+    fte, rate, edit, readonly, editNext, editPrevious, editDown, editUp, className,
+    isEditing, onCancel, onChange, fillRight, fillLeft, viewFteValue, split
 }) => {
   const value = (viewFteValue) ? (fte * (rate || 0)) : fte
   return (
@@ -16,12 +16,14 @@ export const FteCell = ({
         (split)?(['Split', split]):null
       ]}>
         <EditableInput
-          initialContent={value}
+          initialContent={(value == 0) ? '' : value}
           initialReadonly={!isEditing()}
-          allowInlineEdit={!viewFteValue}
+          allowInlineEdit={!viewFteValue && !readonly}
           onComplete={onChange}
           requestEdit={edit}
-          cancelEdit={cancelEdit}
+          finishEdit={onCancel}
+          cancelEdit={onCancel}
+          onCancel={onCancel}
           onUp={editUp}
           onDown={editDown}
           onAltRight={fillRight}

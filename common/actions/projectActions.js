@@ -1,107 +1,72 @@
-import * as ActionType from '../constants/actionTypes'
-import { GlobalActions } from '.'
-import { ServerAPI, ProjectAPI } from '../api'
-import { Utils } from '../utils'
 import { createAction } from 'redux-actions'
 
+import { ActionTypes } from '../constants'
+import { GlobalActions } from '.'
+import { ProjectAPI } from '../api'
+import { Utils } from '../utils'
 
-export const ProjectActions = {
-  projectsLoaded : createAction(ActionType.PROJECTS_LOADED),
-  projectDeleted : createAction(ActionType.PROJECT_DELETED),
-  projectSaved : createAction(ActionType.PROJECT_SAVED),
+
+const ProjectActions = {
+  projectsLoaded: createAction(ActionTypes.PROJECTS_LOADED),
+  projectDeleted: createAction(ActionTypes.PROJECT_DELETED),
+  projectSaved: createAction(ActionTypes.PROJECT_SAVED),
 
   loadProject: (projectId) => {
-    const msg = "loadProject." + projectId
+    const msg = `loadProject.${projectId}`
     return (dispatch) => {
-
       Utils.doRemoteAction(dispatch)({
         msg,
-        remoteAction: () => ProjectAPI.loadProjects({_id: projectId}),
-        successAC: (projects) => ProjectActions.projectsLoaded({forEdit: true, projectId: projectId, projects: projects}),
-        errorAC: (err) => dispatch(GlobalActions.error(err))
+        remoteAction: () => ProjectAPI.loadProjects({ _id: projectId }),
+        successAC: projects => ProjectActions.projectsLoaded({ forEdit: true, projectId, projects }),
+        errorAC: err => dispatch(GlobalActions.error(err)),
       })
     }
   },
 
   loadProjects: (criteria = {}) => {
-    const msg = "loadProjects"
+    const msg = 'loadProjects'
     return (dispatch) => {
-
       Utils.doRemoteAction(dispatch)({
         msg,
         remoteAction: () => ProjectAPI.loadProjects(criteria),
-        successAC: (projects) => ProjectActions.projectsLoaded({activeProjectId: null, projects: projects}),
-        errorAC: (err) => dispatch(GlobalActions.error(err))
+        successAC: projects => ProjectActions.projectsLoaded({ activeProjectId: null, projects }),
+        errorAC: err => dispatch(GlobalActions.error(err)),
       })
     }
   },
-
-  // viewProjects: () => {
-  //   return {
-  //     type: ActionType.VIEW_PROJECTS
-  //   }
-  // },
-
-  // newProject: () => {
-  //   return {
-  //     type: ActionType.NEW_PROJECT
-  //   }
-  // },
 
   saveNewProject: (name) => {
-    const msg = "Saving project " + name
+    const msg = `Saving project ${name}`
     return (dispatch) => {
-
       Utils.doRemoteAction(dispatch)({
         msg,
-        remoteAction: ()=> ProjectAPI.saveProject({name: name}),
-        successAC: (project)=>ProjectActions.projectSaved({project}),
-        errorAC: (err) => console.log(err)
+        remoteAction: () => ProjectAPI.saveProject({ name }),
+        successAC: project => ProjectActions.projectSaved({ project }),
+        errorAC: err => console.log(err),
       })
     }
   },
 
-  // projectSaved: (project) => {
-  //   return {
-  //     type: ActionType.PROJECT_SAVED,
-  //     project: project
-  //   }
-  // },
-
-  deleteProject: (projectId) => {
-    const msg = "Deleting project " + projectId
+  deleteProject: (project) => {
+    const msg = `Deleting project ${project._id}`
     return (dispatch) => {
       const title = 'Confirm'
       const callback = () => {
-
         Utils.doRemoteAction(dispatch)({
           msg,
-          remoteAction: ()=> ProjectAPI.deleteProject(projectId),
-          successAC: ()=> ProjectActions.projectDeleted({projectId})
+          remoteAction: () => ProjectAPI.deleteProject(project._id),
+          successAC: () => ProjectActions.projectDeleted({ projectId: project._id }),
         })
       }
       const cancel = () => null
 
       const dialog = {
-        callback, cancel, title,
-        message: `Delete project ${projectId}?`
+        callback, cancel, title, message: `Delete project ${project.name}?`,
       }
 
       dispatch(GlobalActions.displayDialogYesNo(dialog))
     }
-  }
-
-  // projectDeleted: (projectId) => {
-  //   return {
-  //     type: ActionType.PROJECT_DELETED,
-  //     payload: projectId
-  //   }
-  // },
-  //
-  // viewProjectDetail: (id) => {
-  //   return {
-  //     type: ActionType.VIEW_PROJECT_DETAIL,
-  //     payload: id
-  //   }
-  // }
+  },
 }
+
+export default ProjectActions

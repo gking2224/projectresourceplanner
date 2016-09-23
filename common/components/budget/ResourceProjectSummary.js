@@ -5,12 +5,16 @@ import update from 'react-addons-update'
 import classNames from 'classnames'
 import { Link } from 'react-router'
 import { Paths } from '../../constants/paths'
+import { Utils } from '../../utils'
 
 import './Budget.scss'
 
 const ResourceProjectSummary = React.createClass({
 
-  months: [0,1,2,3,4,5,6,7,8,9,10,11],
+  contextTypes: {
+    getSessionInfo: PropTypes.func,
+    RefData: PropTypes.object
+  },
 
   getInitialState: function () {
     return {
@@ -50,16 +54,6 @@ const ResourceProjectSummary = React.createClass({
     this.setState(
       {budgets: this.props.budgets},
       this.updateCurrentBudget.bind(this, this.props))
-  },
-
-  loadResourceSummary: function() {
-    // const { loadResourceSummary } = this.props
-    // if (this.state.resourceId) loadResourceSummary(this.state.resourceId)
-  },
-
-  update: function() {
-    // const { resource, loadResourceSummary } = this.props
-    // if (resource) loadResourceSummary(resource._id)
   },
 
   render: function () {
@@ -107,8 +101,8 @@ const ResourceProjectSummary = React.createClass({
   renderTotals: function(data, type) {
 
     const key = 'resourceSummary_ftetotal_'+type
-    const monthTotals = this.months.map(m => data.filter(d => d.typeFtes.value.type === type)
-      .reduce((t, d) => t + new Number(d.typeFtes.value.ftes[m]), 0))
+    const monthTotals = Utils.months().map( (month, m) => data.filter(d => d.typeFtes.value.type === type)
+      .reduce((t, d) => t + new Number(d.typeFtes.value.ftes[m]).valueOf(), 0))
     return (
       <tr key={key}>
         <th colSpan={7}>Total {(type === 'forecast')?'Forecast':'Actuals'}</th>
@@ -326,7 +320,8 @@ const ResourceProjectSummary = React.createClass({
   },
 
   locationName: function(locationId) {
-    return this.props.locations.find( l => l._id === locationId).name
+    const { Locations } = this.context.RefData
+    return Locations.byId(locationId).name
   },
 
   expandNums: function(nums, o) {
@@ -334,15 +329,4 @@ const ResourceProjectSummary = React.createClass({
   }
 })
 
-export { ResourceProjectSummary } // for unit testing
-export default connect(
-  state => ({
-    // resource: (state.model.budgets.resourceSummary) ? state.staticRefData.resources.resourceList.find( r => r._id === state.model.budgets.resourceSummary.resourceId) : null,
-    budgets: (state.model.budgets.resourceSummary) && state.model.budgets.resourceSummary.budgetList,
-    projects: state.model.projects.projectList
-  }),
-  dispatch => ({
-  }),
-  null,
-  {withRef: true}
-)(ResourceProjectSummary)
+export { ResourceProjectSummary }

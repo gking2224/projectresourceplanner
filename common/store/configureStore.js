@@ -12,7 +12,7 @@ export default function configureStore(state) {
     applyMiddleware(thunk, promise),
     (typeof window === 'object' && typeof window.devToolsExtension !== 'undefined') ?
       window.devToolsExtension() :
-      (f) => f
+      f => f
   )
   const store = createStore(
     rootReducer,

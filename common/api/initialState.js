@@ -42,7 +42,12 @@ const initialState = () => ({
         'P': 300,
         'C': 400
       }
-    }
+    },
+    contractTypes: [
+      {code: 'M', description: 'Managed Services'},
+      {code: 'P', description: 'Permanent'},
+      {code: 'C', description: 'Contractor'}
+    ]
   },
   menu: {
     activeItem: null,
@@ -62,8 +67,8 @@ export function getInitialState() {
           model: Object.assign(is.model, {
           }),
           staticRefData: Object.assign(is.staticRefData, {
-            locations: {locationList: l},
-            resources: {resourceList: r}
+            locations: l,
+            resources: r
           })
         })
         fulfill(state)

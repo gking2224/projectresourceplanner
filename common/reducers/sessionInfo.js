@@ -1,4 +1,4 @@
-import * as ActionTypes from '../constants/actionTypes'
+import { ActionTypes } from '../constants'
 
 const sessionInfo = (
   state = {
@@ -8,18 +8,18 @@ const sessionInfo = (
   action) => {
 
   switch (action.type) {
-    case ActionTypes.SIGN_IN:
-      return Object.assign({}, state, {
-        loggedOnUser: action.user,
-        permissions: action.permissions
-      })
+  case ActionTypes.SIGN_IN:
+    return Object.assign({}, state, {
+      loggedOnUser: action.payload.user,
+      permissions: action.payload.permissions,
+    })
 
-    case ActionTypes.SIGN_OUT:
-      return Object.assign({}, state, {
-        loggedOnUser: null, permissions: []})
+  case ActionTypes.SIGN_OUT:
+    return Object.assign({}, state, {
+      loggedOnUser: null, permissions: []})
 
-    default:
-      return state
+  default:
+    return state
   }
 }
 

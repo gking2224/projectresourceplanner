@@ -1,31 +1,13 @@
-import React, { Component, PropTypes } from 'react'
-import { connect } from 'react-redux'
-import pd from 'react-prevent-default'
-import keycode from 'keycode'
-import classNames from 'classnames'
-import mouse from 'mouse-event'
+import React, { PropTypes } from 'react'
 
+const CloseControl = ({ hide, onClose }) => (
 
-const CloseControl = React.createClass({
-
-  shouldComponentUpdate: function() {
-    return true
-  },
-
-  componentWillReceiveProps: function(nextProps) {
-    this.setState({
-    })
-  },
-
-  render: function() {
-    const { hide, onClose } = this.props
-    return (
-      <span className={'close-control'}>
-        {(!hide) ? <a href='#' onClick={onClose}>x</a> : <span>&nbsp;</span>}
-      </span>
-    )
-  }
-
-
-})
+  <span className={'close-control'}>
+    {(!hide) ? <a href={'#'} onClick={onClose}>x</a> : <span>&nbsp;</span>}
+  </span>
+)
+CloseControl.propTypes = {
+  hide: PropTypes.boolean,
+  onClose: PropTypes.func,
+}
 export default CloseControl

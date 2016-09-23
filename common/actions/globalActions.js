@@ -1,45 +1,46 @@
-import * as ActionType from '../constants/actionTypes'
 import { createAction } from 'redux-actions'
 
+import { ActionTypes } from '../constants'
+
 export const GlobalActions = {
-  userWarning: createAction(ActionType.USER_WARNING),
+  userWarning: createAction(ActionTypes.USER_WARNING),
   callingServer: (payload) => {
     return {
       payload,
-      type: ActionType.CALLING_SERVER
+      type: ActionTypes.CALLING_SERVER
     }
   },
   serverReturned: (payload) => {
     return {
       payload,
-      type: ActionType.SERVER_RETURNED
+      type: ActionTypes.SERVER_RETURNED
     }
   },
 
   displayDialogYesNo: (payload) => {
     return {
-      type: ActionType.DIALOG_YES_NO,
+      type: ActionTypes.DIALOG_YES_NO,
       payload
     }
   },
 
   displayDialogOk: (payload) => {
     return {
-      type: ActionType.DIALOG_OK,
+      type: ActionTypes.DIALOG_OK,
       payload
     }
   },
 
   displayDialogOkCancel: (payload) => {
     return {
-      type: ActionType.DIALOG_OK_CANCEL,
+      type: ActionTypes.DIALOG_OK_CANCEL,
       payload
     }
   },
 
   clearDialog: () => {
     return {
-      type: ActionType.CLEAR_DIALOG
+      type: ActionTypes.CLEAR_DIALOG
     }
   },
 
@@ -48,7 +49,7 @@ export const GlobalActions = {
     console.log(err)
     console.log(message)
     return {
-      type: ActionType.ERROR,
+      type: ActionTypes.ERROR,
       payload: {
         err, message
       }

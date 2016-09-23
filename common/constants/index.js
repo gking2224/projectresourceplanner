@@ -1,4 +1,4 @@
-export * from './actionTypes'
+export { default as ActionTypes } from './actionTypes'
 export * from './permissions'
 export * from './propTypes'
 export * from './paths'

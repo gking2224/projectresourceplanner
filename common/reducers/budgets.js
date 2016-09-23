@@ -1,11 +1,10 @@
-import * as ActionTypes from '../constants/actionTypes'
+import { ActionTypes } from '../constants'
 import update from 'react-addons-update'
 import { BudgetUtils } from '../utils'
 
 
 const Budgets = (
-    state = {
-    },
+    state = {budgetList: []},
     action) => {
 
   let newState
@@ -34,7 +33,8 @@ const Budgets = (
       return deleteBudget(state, action.payload.budgetId)
 
     case ActionTypes.BUDGET_SAVED:
-      return replaceOrAddBudget(state, action.payload.budget)
+      newState = replaceOrAddBudget(state, action.payload.budget)
+      return Object.assign(newState, {activeBudgetId: action.payload.budget._id})
 
     case ActionTypes.VIEW_RESOURCE_SUMMARY:
       return update(state, {resourceSummary: {$set: {

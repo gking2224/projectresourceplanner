@@ -1,6 +1,6 @@
 import { createAction } from 'redux-actions'
 
-import * as ActionType from '../constants/actionTypes'
+import { ActionTypes } from '../constants'
 import { GlobalActions } from '.'
 import { BudgetAPI } from '../api'
 import { Utils } from '../utils'
@@ -8,11 +8,11 @@ import { Utils } from '../utils'
 const errorHandler = (err) => GlobalActions.error(err)
 
 export const BudgetActions = {
-  budgetDeleted: createAction(ActionType.BUDGET_DELETED),
+  budgetDeleted: createAction(ActionTypes.BUDGET_DELETED),
   // budgetUpdated: createAction(ActionType.BUDGET_UPDATED),
-  budgetSaved: createAction(ActionType.BUDGET_SAVED),
-  budgetsLoaded: createAction(ActionType.BUDGETS_LOADED),
-  viewResourceSummary: createAction(ActionType.VIEW_RESOURCE_SUMMARY),
+  budgetSaved: createAction(ActionTypes.BUDGET_SAVED),
+  budgetsLoaded: createAction(ActionTypes.BUDGETS_LOADED),
+  viewResourceSummary: createAction(ActionTypes.VIEW_RESOURCE_SUMMARY),
 
   loadResourceSummary:({resourceId}) => {
     const msg = "loadResourceSummary " + resourceId
@@ -66,18 +66,18 @@ export const BudgetActions = {
     }
   },
 
-  setDefault:({budgetId, isDefault}) => {
-    const msg = "Set default " + budgetId + " " + isDefault
-    return (dispatch) => {
-
-      Utils.doRemoteAction(dispatch)({
-        msg,
-        remoteAction: () => BudgetAPI.setDefault({budgetId: budgetId, isDefault: isDefault}),
-        successAC: () => createAction(ActionType.BUDGET_DEFAULT_SET)({budgetId, isDefault}),
-        errorAC: errorHandler
-      })
-    }
-  },
+  // setDefault:({budgetId, isDefault}) => {
+  //   const msg = "Set default " + budgetId + " " + isDefault
+  //   return (dispatch) => {
+  //
+  //     Utils.doRemoteAction(dispatch)({
+  //       msg,
+  //       remoteAction: () => BudgetAPI.setDefault({budgetId: budgetId, isDefault: isDefault}),
+  //       successAC: () => createAction(ActionType.BUDGET_DEFAULT_SET)({budgetId, isDefault}),
+  //       errorAC: errorHandler
+  //     })
+  //   }
+  // },
   // viewBudget:({budgetId}) => {
   //   const msg = "View budget " + budgetId
   //   return (dispatch) => {
@@ -138,7 +138,7 @@ export const BudgetActions = {
         errorAC: errorHandler
       })
     }
-    return {type: ActionType.SAVE_ACTIVE_BUDGET}
+    return {type: ActionTypes.SAVE_ACTIVE_BUDGET}
   }
   //
   // cancelBudgetUpdate:createAction(ActionType.CANCEL_BUDGET_UPDATE),

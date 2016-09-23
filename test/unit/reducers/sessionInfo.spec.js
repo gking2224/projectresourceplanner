@@ -1,45 +1,44 @@
 import { expect } from 'chai'
 import deepFreeze from 'deep-freeze'
-import sinon from 'sinon'
-import reducer from '../../common/reducers/sessionInfo'
-import * as ActionType from '../../common/constants/actionTypes'
-import * as Actions from '../../common/actions/menuActions'
+import reducer from '../../../common/reducers/sessionInfo'
+import { ActionTypes } from '../../../common/constants'
+import { MenuActions } from '../../../common/actions'
 
 describe('sessionInfo reducer', () => {
   it('should provide the initial state', () => {
-    const stateBefore = undefined;
-    const stateAfter = reducer(stateBefore, {});
+    const stateBefore = undefined
+    const stateAfter = reducer(stateBefore, {})
     expect(stateAfter).to.exist
     expect(stateAfter.permissions).to.exist
     expect(stateAfter.permissions).to.have.length(0)
     expect(stateAfter.loggedOnUser).to.be.null
   })
 
-  it(`should clear credentials on ${ActionType.SIGN_OUT} action`, () => {
+  it(`should clear credentials on ${ActionTypes.SIGN_OUT} action`, () => {
     const stateBefore = {
       loggedOnUser: {},
-      permissions: ['x', 'y', 'z']
+      permissions: ['x', 'y', 'z'],
     }
-    const action = Actions.signOut()
+    const action = MenuActions.signOut()
     const expectedAfter = {
       loggedOnUser: null,
-      permissions: []
+      permissions: [],
     }
 
     deepFreeze(stateBefore)
     deepFreeze(action)
 
-    const actualAfter = reducer(stateBefore, action);
+    const actualAfter = reducer(stateBefore, action)
 
     expect(actualAfter).to.eql(expectedAfter)
   })
 
-  it(`should set credentials on ${ActionType.SIGN_IN} action`, () => {
+  it(`should set credentials on ${ActionTypes.SIGN_IN} action`, () => {
     const stateBefore = {
       loggedOnUser: null,
-      permissions: []
+      permissions: [],
     }
-    const action = Actions.signIn()
+    const action = MenuActions.signIn()
 
     deepFreeze(stateBefore)
     deepFreeze(action)

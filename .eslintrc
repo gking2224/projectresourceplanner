@@ -1,0 +1,17 @@
+{
+  "extends": "airbnb",
+  "plugins": [
+    "react",
+    "jsx-a11y",
+    "import"
+  ],
+  "rules": {
+    "indent": ["error", 2],
+    "semi": ["warn", "never"],
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }],
+    "max-len": ["error", 120],
+    "padded-blocks": ["error", {"classes": "never"}],
+    "object-curly-spacing": ["off"],
+    "space-before-function-paren": ["off"]
+  }
+}

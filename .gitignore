@@ -1,2 +1,14 @@
 .idea/
 node_modules/
+data/
+data2/
+dist/
+coverage/
+graveyard/
+npm-debug.log
+public/bundle.js
+karma_html/
+mochawesome-reports/
+test/.bak/
+test/config/
+test/integration/
