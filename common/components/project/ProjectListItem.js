@@ -5,6 +5,7 @@ import { Utils } from '../../utils'
 import { DeleteControl, PermissionedLink } from '../widgets'
 
 const ProjectListItem = ({project, onDelete}, {getSessionInfo}) => {
+  console.log(project)
   const {name, _id} = project
   const sessionInfo = getSessionInfo()
   return (

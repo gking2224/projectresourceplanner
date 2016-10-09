@@ -1,4 +1,6 @@
 import React from 'react'
+import XMLHttpRequest from 'xmlhttprequest'
+
 import { GlobalActions } from '../actions'
 
 export const Utils = {
@@ -11,7 +13,9 @@ export const Utils = {
       return Utils.doIt(positive)
     }
     else {
-      return (negative) ? Utils.doIt(negative) : <span className={"missingPermission missingPermission_" + permission}></span>
+      return (negative) ?
+        Utils.doIt(negative) :
+        <span className={`missingPermission missingPermission_${permission}`}></span>
     }
   },
 
@@ -20,11 +24,11 @@ export const Utils = {
   },
 
   hasAllPermissions: (sessionInfo, permissions) => {
-    return permission.reduce( (b, p) => b && Utils.hasPermission(sessionInfo, p), true)
+    return permissions.reduce( (b, p) => b && Utils.hasPermission(sessionInfo, p), true)
   },
 
-  hasAtLeastOnePermission: (sessionInfo, permissions,) => {
-    return permission.reduce( (b, p) => b || Utils.hasPermission(sessionInfo, p), false)
+  hasAtLeastOnePermission: (sessionInfo, permissions) => {
+    return permissions.reduce( (b, p) => b || Utils.hasPermission(sessionInfo, p), false)
   },
 
   doIt: (it) => {
@@ -49,6 +53,6 @@ export const Utils = {
         if (errorAC) dispatch(errorAC(e))
       })
     }
-  }
+  },
 
 }

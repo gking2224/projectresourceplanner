@@ -16,7 +16,7 @@ const ProjectBudgetList = ({ budgets, toggleDefault, addNewBudget }, { getSessio
 }
 
 const budgetsByYear = (budgets = [], toggleDefault, addNewBudget, sessionInfo) => {
-  const years = [...new Set(budgets.map(b => b.year))].sort().map(n => new Number(n).valueOf())
+  const years = [...new Set(Object.keys(budgets).map(b => budgets[b].year))].sort().map(n => new Number(n).valueOf())
 
   const additionalYear = (years.length > 0) ? years[years.length - 1] + 1 : 2016
   return (
@@ -29,8 +29,8 @@ const budgetsByYear = (budgets = [], toggleDefault, addNewBudget, sessionInfo) =
 }
 
 const yearSummary = (year, budgets, toggleDefault, addNewBudget, sessionInfo) => {
-  const yearBudgets = budgets.filter(b => b.year == year)
-  const key  = year
+  const yearBudgets = Object.keys(budgets).filter(b => budgets[b].year == year).map(b => budgets[b])
+  const key = year
   return (
     <div key={key}>
       <h4><span>{year.toString()}</span></h4>

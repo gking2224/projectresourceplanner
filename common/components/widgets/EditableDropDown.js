@@ -55,7 +55,7 @@ export const EditableDropDown = React.createClass({
     // if we don't allow no value and a value is selected, take the initial empty value out
     const deleteTopValue = nextProps.initialValue && !labels[0] && !this.props.allowBlank
     this.setState(update(this.state, {
-      selectValue: {$set: selectedValue},
+      selectedValue: {$set: selectedValue},
       selectedLabel: {$set: selectedLabel},
       readonly: {$set: nextProps.initialReadonly},
       values: {$splice: [[0, (deleteTopValue)?1:0]]},

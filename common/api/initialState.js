@@ -1,5 +1,5 @@
 
-import { ServerAPI, ProjectAPI, BudgetAPI } from '.'
+import { ServerAPI, ProjectAPI, BudgetAPI, StaticData } from '.'
 
 const initialState = () => ({
   global: {
@@ -55,25 +55,27 @@ const initialState = () => ({
   }
 })
 
+const keyById = (c) => {
+  const rv = {}
+  c.forEach(e => rv[e._id] = e)
+  return rv
+}
 
 export function getInitialState() {
 
   return new Promise((fulfill, reject) => {
-
-    ServerAPI.getResources().then(r =>
-      ServerAPI.getLocations().then(l => {
+    StaticData.getResources().then(r => {
+      StaticData.getLocations().then(l => {
         const is = initialState()
         const state = Object.assign(is, {
-          model: Object.assign(is.model, {
-          }),
+          model: Object.assign(is.model, {}),
           staticRefData: Object.assign(is.staticRefData, {
-            locations: l,
-            resources: r
-          })
+            locations: keyById(l),
+            resources: keyById(r),
+          }),
         })
         fulfill(state)
       })
-    )
+    })
   })
 }
-

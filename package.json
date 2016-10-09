@@ -4,7 +4,7 @@
   "description": "Tool for planning project resources and budgets",
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
-    "start:dev": "webpack-dev-server --inline --content-base public --history-api-fallback",
+    "start:dev": "webpack-dev-server --inline --no-info --content-base public --history-api-fallback",
     "start:prod": "webpack && node server.js",
     "test": "cross-env NODE_ENV=test mocha --recursive --require ignore-styles --compilers js:babel-register",
     "test:watch": "npm test -- --watch"
@@ -53,11 +53,14 @@
     "webpack": "^1.13.2",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-dev-server": "^1.15.2",
-    "webpack-hot-middleware": "^2.12.2"
+    "webpack-hot-middleware": "^2.12.2",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "babel-core": "^6.14.0",
+    "babel-eslint": "^7.0.0",
     "babel-loader": "^6.2.5",
+    "babel-plugin-transform-class-properties": "^6.16.0",
     "babel-plugin-transform-react-jsx-source": "^6.9.0",
     "babel-preset-es2015": "^6.14.0",
     "babel-preset-react": "^6.11.1",

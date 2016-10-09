@@ -46,7 +46,7 @@ export const GlobalActions = {
 
   error: (err, message) => {
     console.log('error')
-    console.log(err)
+    console.log(err.stack)
     console.log(message)
     return {
       type: ActionTypes.ERROR,

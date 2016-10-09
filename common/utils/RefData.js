@@ -7,13 +7,25 @@ const resourceDisplayName = (resource) => {
 const Location = {
 
   byId: (staticRefData, id) => {
-    return staticRefData.locations.find(l => l._id === id)
+    return staticRefData.locations[id]
+  },
+
+  byName: (staticRefData, name) => {
+    return staticRefData.locations[
+      Object.keys(staticRefData.locations).find(l => staticRefData.locations[l].name === name)]
+  },
+  rateByName: (staticRefData, name, contractType = 'P') => {
+    const loc = Location.byName(staticRefData, name)
+    return (loc) ? loc.rates[contractType] : null
   },
   rateById: (staticRefData, id, contractType = 'P') => {
     const loc = Location.byId(staticRefData, id)
-    return Location.rateByCity(staticRefData, loc.city, contractType) ||
-      Location.rateByCountry(staticRefData, loc.country, contractType) ||
-      Location.defaultRate(staticRefData, contractType)
+    return (loc) ?
+      Location.rateByName(staticRefData, loc.building, contractType) ||
+        Location.rateByName(staticRefData, loc.city, contractType) ||
+        Location.rateByName(staticRefData, loc.country, contractType) ||
+        null :
+      null
   },
   rateByCity: (staticRefData, city, contractType = 'P') => {
     const data = staticRefData.locationRates[city]
@@ -34,8 +46,8 @@ const RefData = (staticRefData) => {
 
     Locations: {
       listAll: () => staticRefData.locations,
-      names: () => staticRefData.locations.map(l => l.name),
-      ids: () => staticRefData.locations.map(l => l._id),
+      names: () => Object.keys(staticRefData.locations).map(l => staticRefData.locations[l].name),
+      ids: () => Object.keys(staticRefData.locations).map(l => Number(l)),
       byId: Location.byId.bind(null, staticRefData),
       rateById: Location.rateById.bind(null, staticRefData),
       rateByCity: Location.rateByCity.bind(null, staticRefData),
@@ -45,8 +57,10 @@ const RefData = (staticRefData) => {
 
     Resources: {
       displayName: (resource) => resourceDisplayName(resource),
-      listAll: () => staticRefData.resources.map(r => Object.assign({}, r, {displayName: resourceDisplayName(r)})),
-      byId: (id) => staticRefData.resources.find( (r) => r._id === id)
+      listAll: () => Object.keys(staticRefData.resources)
+        .map(r => Object.assign(
+          {}, staticRefData.resources[r], {displayName: resourceDisplayName(staticRefData.resources[r])})),
+      byId: (id) => staticRefData.resources[id],
     },
 
     ContractTypes: {

@@ -1,10 +1,10 @@
 import { ActionTypes } from '../constants'
 import update from 'react-addons-update'
-import { BudgetUtils } from '../utils'
+import { BudgetUtils, ReducerUtils } from '../utils'
 
 
 const Budgets = (
-    state = {budgetList: []},
+    state = {},
     action) => {
 
   let newState
@@ -13,34 +13,38 @@ const Budgets = (
 
     case ActionTypes.BUDGETS_LOADED:
 
-      newState = replaceOrAddBudgets(state, action.payload.budgets)
-      if (action.payload.forEdit && action.payload.budgets.length === 1) {
-        newState = update(newState, {
-          activeBudgetId: {$set: action.payload.budgets[0]._id},
-          activeProjectId: {$set: action.payload.budgets[0].project}
-        })
-      }
-      return newState
+      return ReducerUtils.addEntity(state, action.payload.budgets || action.payload.budget)
 
-    case ActionTypes.PROJECTS_LOADED:
-      return update(state, {
-        activeProjectId: {$set: action.payload.projectId},
-        activeBudgetId: {$set: null},
-        budgetList: {$set: (action.payload.projects.length > 1) ? undefined : state.budgetList}
-      })
+      // newState = replaceOrAddBudgets(state, action.payload.budgets)
+      // if (action.payload.forEdit && action.payload.budgets.length === 1) {
+      //   newState = update(newState, {
+      //     activeBudgetId: {$set: action.payload.budgets[0]._id},
+      //     activeProjectId: {$set: action.payload.budgets[0].project}
+      //   })
+      // }
+      // return newState
+
+    // case ActionTypes.PROJECTS_LOADED:
+    //   return update(state, {
+    //     activeProjectId: {$set: action.payload.projectId},
+    //     activeBudgetId: {$set: null},
+    //     budgetList: {$set: (action.payload.projects.length > 1) ? undefined : state.budgetList}
+    //   })
 
     case ActionTypes.BUDGET_DELETED:
-      return deleteBudget(state, action.payload.budgetId)
+      return update(state, {[action.payload.budgetId]: {$set: undefined}})
 
     case ActionTypes.BUDGET_SAVED:
-      newState = replaceOrAddBudget(state, action.payload.budget)
-      return Object.assign(newState, {activeBudgetId: action.payload.budget._id})
+      return ReducerUtils.addEntity(state, action.payload.budget)
+      // newState = replaceOrAddBudget(state, action.payload.budget)
+      // return Object.assign(newState, {activeBudgetId: action.payload.budget._id})
 
     case ActionTypes.VIEW_RESOURCE_SUMMARY:
-      return update(state, {resourceSummary: {$set: {
-        budgetList: action.payload.budgets,
-        resourceId: action.payload.resourceId
-      }}})
+      return ReducerUtils.addEntity(state, action.payload.budgets)
+      // return update(state, {resourceSummary: {$set: {
+      //   budgetList: action.payload.budgets,
+      //   resourceId: action.payload.resourceId
+      // }}})
     default:
       return state
   }

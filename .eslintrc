@@ -1,4 +1,5 @@
 {
+  "parser": "babel-eslint",
   "extends": "airbnb",
   "plugins": [
     "react",
@@ -12,6 +13,10 @@
     "max-len": ["error", 120],
     "padded-blocks": ["error", {"classes": "never"}],
     "object-curly-spacing": ["off"],
-    "space-before-function-paren": ["off"]
+    "space-before-function-paren": ["off"],
+    "comma-dangle": ["off"],
+    "class-methods-use-this": ["off"],
+    "no-else-return": ["off"],
+    "brace-style": ["error", "stroustrup"]
   }
 }

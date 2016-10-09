@@ -3,11 +3,11 @@ import { Constants } from '../constants'
 export const BudgetUtils = {
   nilForecast: () => ([0,0,0,0,0,0,0,0,0,0,0,0]),
 
-  createNewBudget: (year, projectId) => ({year: year, name: 'New Budget', project: projectId, roles: []}),
+  createNewBudget: (projectId, year) => ({projectId, year, name: 'New Budget', roles: []}),
 
   emptyRole: () => ({
-    fteRequirement: BudgetUtils.nilForecast(),
-    resourceAllocations: []
+    ftes: BudgetUtils.nilForecast(),
+    allocations: [],
   }),
 
   emptyAllocation: () => ({
@@ -20,7 +20,7 @@ export const BudgetUtils = {
   },
 
   roleActualsToDate: function(role, reportingMonth) {
-    return role.resourceAllocations.reduce( (t, ra) => t + this.allocationActualsToDate(ra, reportingMonth), 0)
+    return role.allocations.reduce( (t, ra) => t + this.allocationActualsToDate(ra, reportingMonth), 0)
   },
 
   allocationActualsToDate: function(alloc, reportingMonth) {
@@ -36,7 +36,7 @@ export const BudgetUtils = {
   },
 
   roleRemainingForecast: function(role, reportingMonth) {
-    return role.resourceAllocations.reduce( (t, ra) => t + this.allocationRemainingForecast(ra, reportingMonth), 0)
+    return role.allocations.reduce( (t, ra) => t + this.allocationRemainingForecast(ra, reportingMonth), 0)
   },
 
   allocationRemainingForecast: function(alloc, reportingMonth) {
@@ -52,7 +52,7 @@ export const BudgetUtils = {
   },
 
   roleFteYearTotal: function(role, value = false) {
-    return role.fteRequirement.reduce( (t, month) => t + (new Number(month ||0) * ((value) ? (role.rate || 0) : 1)), 0)
+    return role.ftes.reduce( (t, month) => t + (new Number(month ||0) * ((value) ? (role.rate || 0) : 1)), 0)
   },
 
   budgetFteMonthTotals: function(budget, value = false) {
@@ -61,11 +61,11 @@ export const BudgetUtils = {
 
   fteMonthTotal: function(budget, month, value = false) {
     return budget.roles.reduce( (t, r) =>
-      t + (new Number(r.fteRequirement[month] || 0) * ((value) ? (r.rate || 0) : 1)), 0).valueOf()
+      t + (new Number(r.ftes[month] || 0) * ((value) ? (r.rate || 0) : 1)), 0).valueOf()
   },
 
-  allocationMonthTotals: function(resourceAllocations, type, value = false) {
-    return Constants.MONTH_INDICES.map((month) => resourceAllocations.reduce((total, ra) =>
+  allocationMonthTotals: function(allocations, type, value = false) {
+    return Constants.MONTH_INDICES.map((month) => allocations.reduce((total, ra) =>
         (total + ((new Number(ra[type][month] || 0)).valueOf() * ((value) ? (ra.rate || 0) : 1))), 0)
     )
   }

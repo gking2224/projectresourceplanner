@@ -2,7 +2,7 @@ import { createAction } from 'redux-actions'
 
 import { ActionTypes } from '../constants'
 import { GlobalActions } from '.'
-import { ProjectAPI } from '../api'
+import { ProjectApi } from '../api'
 import { Utils } from '../utils'
 
 
@@ -11,25 +11,25 @@ const ProjectActions = {
   projectDeleted: createAction(ActionTypes.PROJECT_DELETED),
   projectSaved: createAction(ActionTypes.PROJECT_SAVED),
 
-  loadProject: (projectId) => {
+  loadProject: (projectId, xhr) => {
     const msg = `loadProject.${projectId}`
     return (dispatch) => {
       Utils.doRemoteAction(dispatch)({
         msg,
-        remoteAction: () => ProjectAPI.loadProjects({ _id: projectId }),
-        successAC: projects => ProjectActions.projectsLoaded({ forEdit: true, projectId, projects }),
+        remoteAction: () => ProjectApi.loadProject(projectId, xhr),
+        successAC: projects => ProjectActions.projectsLoaded({ projectId, projects }),
         errorAC: err => dispatch(GlobalActions.error(err)),
       })
     }
   },
 
-  loadProjects: (criteria = {}) => {
+  loadProjects: () => {
     const msg = 'loadProjects'
     return (dispatch) => {
       Utils.doRemoteAction(dispatch)({
         msg,
-        remoteAction: () => ProjectAPI.loadProjects(criteria),
-        successAC: projects => ProjectActions.projectsLoaded({ activeProjectId: null, projects }),
+        remoteAction: () => ProjectApi.loadProjects(),
+        successAC: projects => ProjectActions.projectsLoaded({ projectId: null, projects }),
         errorAC: err => dispatch(GlobalActions.error(err)),
       })
     }
@@ -40,9 +40,9 @@ const ProjectActions = {
     return (dispatch) => {
       Utils.doRemoteAction(dispatch)({
         msg,
-        remoteAction: () => ProjectAPI.saveProject({ name }),
+        remoteAction: () => ProjectApi.saveProject({ name }),
         successAC: project => ProjectActions.projectSaved({ project }),
-        errorAC: err => console.log(err),
+        errorAC: err => dispatch(GlobalActions.error(err)),
       })
     }
   },
@@ -54,7 +54,7 @@ const ProjectActions = {
       const callback = () => {
         Utils.doRemoteAction(dispatch)({
           msg,
-          remoteAction: () => ProjectAPI.deleteProject(project._id),
+          remoteAction: () => ProjectApi.deleteProject(project._id),
           successAC: () => ProjectActions.projectDeleted({ projectId: project._id }),
         })
       }

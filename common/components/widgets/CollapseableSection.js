@@ -8,7 +8,7 @@ const CollapseableSection = React.createClass({
   getInitialState: function() {
 
     return {
-      expanded: this.props.initialExpanded
+      expanded: this.props.initialExpanded,
     }
   },
   render: function() {
@@ -33,14 +33,14 @@ const CollapseableSection = React.createClass({
   },
   onToggle: function() {
     this.setState({
-      expanded: !this.state.expanded
+      expanded: !this.state.expanded,
     }, this.sendToggleEvent)
   },
 
   sendToggleEvent: function() {
     if (this.state.expanded && this.props.onOpen) this.props.onOpen()
     if (!this.state.expanded && this.props.onClose) this.props.onClose()
-  }
+  },
 
 })
 export {CollapseableSection}

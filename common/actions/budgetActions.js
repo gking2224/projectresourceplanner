@@ -3,68 +3,75 @@ import { createAction } from 'redux-actions'
 import { ActionTypes } from '../constants'
 import { GlobalActions } from '.'
 import { BudgetAPI } from '../api'
+import { ProjectApi } from '../api'
 import { Utils } from '../utils'
 
 const errorHandler = (err) => GlobalActions.error(err)
 
 export const BudgetActions = {
   budgetDeleted: createAction(ActionTypes.BUDGET_DELETED),
-  // budgetUpdated: createAction(ActionType.BUDGET_UPDATED),
+  updateBudget: createAction(ActionTypes.BUDGET_UPDATED),
   budgetSaved: createAction(ActionTypes.BUDGET_SAVED),
   budgetsLoaded: createAction(ActionTypes.BUDGETS_LOADED),
   viewResourceSummary: createAction(ActionTypes.VIEW_RESOURCE_SUMMARY),
 
-  loadResourceSummary:({resourceId}) => {
+  loadResourceSummary: (resourceId, xhr) => {
     const msg = "loadResourceSummary " + resourceId
     return (dispatch) => {
-
       Utils.doRemoteAction(dispatch)({
         msg,
-        remoteAction: () => BudgetAPI.getBudgetsReferencingResource({resourceId: resourceId}),
-        successAC: ({budgets, projects}) => {
-          return BudgetActions.viewResourceSummary({resourceId, budgets, projects})
+        remoteAction: () => BudgetAPI.getBudgetsReferencingResource(resourceId, xhr),
+        successAC: (budgets) => {
+          return new Promise((fulfill, reject) => {
+            ProjectApi.loadProjects(xhr)
+              .then( (projects) => fulfill(BudgetActions.viewResourceSummary({resourceId, budgets, projects})))
+              .catch(err => dispatch(errorHandler(err)))
+          })
         },
         errorAC: errorHandler
       })
     }
   },
 
-  // newBudget:(projectId, year) => {
-  //   const msg = "newBudget " + projectId
-  //   return (dispatch) => {
-  //
-  //     Utils.doRemoteAction(dispatch)({
-  //       msg,
-  //       remoteAction: () => ProjectAPI.loadProjects({_id: projectId}),
-  //       successAC: (projects) => createAction(ActionType.NEW_BUDGET)({
-  //         project: projects[0],
-  //         year
-  //       }),
-  //       errorAC: errorHandler(dispatch)
-  //     })
-  //   }
-  // },
-
-  loadBudget: (budgetId) => {
-    const msg = "loadBudget." + budgetId
-    return BudgetActions.loadBudgets(msg, {_id: budgetId}, {forEdit: true})
-  },
-
-  loadProjectBudgets:(projectId) => {
-    const msg = "loadProjectBudgets." + projectId
-    return BudgetActions.loadBudgets(msg, {project: projectId}, {projectId})
-  },
-
-  loadBudgets: (msg, criteria = {}, payload = {}) => {
+  createNewBudget: (projectId, year, xhr) => {
+    const msg = "newBudget " + projectId
     return (dispatch) => {
+
       Utils.doRemoteAction(dispatch)({
         msg,
-        remoteAction: () => BudgetAPI.getBudgets(criteria),
-        successAC: (budgets) => BudgetActions.budgetsLoaded(Object.assign(payload, {budgets})),
+        remoteAction: () => ProjectApi.loadProject(projectId, xhr),
+        successAC: (project) => createAction(ActionTypes.NEW_BUDGET)({project, year}),
         errorAC: errorHandler
       })
     }
   },
+
+  loadBudget: (budgetId, xhr) => {
+    const msg = "loadBudget." + budgetId
+    return (dispatch) => {
+      Utils.doRemoteAction(dispatch)({
+        msg,
+        remoteAction: () => BudgetAPI.getBudget(budgetId, xhr),
+        successAC: (budget) => BudgetActions.budgetsLoaded({budget, forView: true}),
+        errorAC: errorHandler,
+      })
+    }
+  },
+
+  loadProjectBudgets:(projectId) => {
+    const msg = "loadProjectBudgets." + projectId
+    return (dispatch) => {
+      Utils.doRemoteAction(dispatch)({
+        msg,
+        remoteAction: () => BudgetAPI.getProjectBudgets(projectId),
+        successAC: (budgets) => BudgetActions.budgetsLoaded({budgets}),
+        errorAC: errorHandler
+      })
+    }
+  },
+
+  // loadBudgets: (msg, criteria = {}, payload = {}) => {
+  // },
 
   // setDefault:({budgetId, isDefault}) => {
   //   const msg = "Set default " + budgetId + " " + isDefault
@@ -90,7 +97,7 @@ export const BudgetActions = {
   //     })
   //   }
   // },
-  deleteBudget:({budget}) => {
+  deleteBudget:({budget, xhr}) => {
     const msg = "Deleting budget " + budget._id
     return (dispatch) => {
       const title = 'Confirm'
@@ -98,7 +105,7 @@ export const BudgetActions = {
 
         Utils.doRemoteAction(dispatch)({
           msg,
-          remoteAction: ()=> BudgetAPI.deleteBudget(budget._id),
+          remoteAction: ()=> BudgetAPI.deleteBudget(budget._id, xhr),
           successAC: ()=> BudgetActions.budgetDeleted({budgetId: budget._id}),
           errorAC: errorHandler
         })
@@ -112,11 +119,19 @@ export const BudgetActions = {
       dispatch(GlobalActions.displayDialogYesNo(dialog))
     }
   },
-  // editBudget:() => {
-  //   return {
-  //     type: ActionType.EDIT_BUDGET
-  //   }
-  // },
+
+  editBudget: (budgetId) => {
+    const msg = "Editing budget " + budgetId
+    return (dispatch) => {
+      Utils.doRemoteAction(dispatch)({
+        msg,
+        remoteAction: () => BudgetAPI.getBudget(budgetId),
+        successAC: (budget) => BudgetActions.budgetsLoaded({budget, forEdit: true}),
+        errorAC: errorHandler
+      })
+    }
+  },
+
   //
   // addBudgetRole:() => {
   //   return {
@@ -124,13 +139,13 @@ export const BudgetActions = {
   //   }
   // },
 
-  saveBudget:(budget, callback) => {
+  saveBudget:(budget, callback, xhr) => {
     const msg = "Saving budget"
     return (dispatch) => {
 
       Utils.doRemoteAction(dispatch)({
         msg,
-        remoteAction: ()=> BudgetAPI.saveBudget(budget),
+        remoteAction: ()=> BudgetAPI.saveBudget(budget, xhr),
         successAC: (saved) => {
           if (callback) callback(true)
           return BudgetActions.budgetSaved({budget: saved})
@@ -139,7 +154,7 @@ export const BudgetActions = {
       })
     }
     return {type: ActionTypes.SAVE_ACTIVE_BUDGET}
-  }
+  },
   //
   // cancelBudgetUpdate:createAction(ActionType.CANCEL_BUDGET_UPDATE),
 

@@ -2,42 +2,34 @@
 import Datastore from 'nedb'
 
 import { upsertOptions, errHandler } from '.'
-
-import { ProjectAPI } from './projectApi'
+import { Server } from '../utils'
+import { ProjectApi } from './projectApi'
 
 const datastore = new Datastore('data/budgets2.db')
 datastore.loadDatabase(errHandler)
 
+const SERVICE = 'budgets'
+
 export const BudgetAPI = {
 
+  getProjectBudgets: (projectId, xhr) =>
+    Server.doGet({service: SERVICE, resource: `/budgets/project/${projectId}`, xhr}),
 
-  getBudgets: (crit = {}) => {
-    return new Promise((fulfill, reject) => {
-      datastore.find(crit, (err, docs) => {
-        if (err) reject(err)
-        else fulfill(docs)
-      })
-    })
-  },
+  getBudgets: xhr => Server.doGet({service: SERVICE, resource: '/budgets', xhr}),
 
-  saveBudget: (budget) => {
-    //budget.roles.forEach(r => r.resourceAllocations.forEach(a => a.resourceId='AM1IQjCtxE9MGq3h'))
-    return new Promise((fulfill, reject) => {
-      datastore.update({_id: budget._id}, budget, upsertOptions, (err, n, upsert) => {
-        if (err) reject(err)
-        else fulfill(upsert)
-      })
-    })
+  getBudget: (budgetId, xhr) => Server.doGet({service: SERVICE, resource: `/budgets/${budgetId}`, xhr}),
+
+  saveBudget: (budget, xhr) => {
+    let resource = '/budgets'
+    if (budget._id) {
+      resource = `${resource}/${budget._id}`
+      return Server.doPut({service:SERVICE, resource, body: budget, xhr})
+    }
+    else {
+      return Server.doPost({service:SERVICE, resource, body: budget, xhr})
+    }
   },
-  deleteBudget: (budgetId) => {
-    return new Promise((fulfill, reject)=> {
-      datastore.remove({_id: budgetId}, {}, (err, n) => {
-        if (err) reject(err)
-        else if (n !== 1) reject("num deleted != 1")
-        else fulfill()
-      })
-    })
-  },
+  deleteBudget: (budgetId) => Server.doDelete({service: SERVICE, resource: `budgets/${budgetId}`, xhr}),
 
   setDefault: ({budgetId, isDefault}) => {
     return new Promise((fulfill, reject)=> {
@@ -49,19 +41,6 @@ export const BudgetAPI = {
     })
   },
 
-  getBudgetsReferencingResource: ({resourceId}) => {
-    return new Promise((fulfill, reject)=> {
-      datastore.find({"roles.resourceAllocations.resourceId": resourceId}, (err, budgets) => {
-        if (err) reject(err)
-        else {
-          const projectIds = [...new Set(budgets.map(b=> b.project))]
-          ProjectAPI.loadProjects({_id: {$in: projectIds}} )
-            .then( (projects) => {
-              fulfill({budgets, projects})
-            })
-            .catch( (err) => reject(err))
-        }
-      })
-    })
-  }
+  getBudgetsReferencingResource: (resourceId, xhr) =>
+    Server.doGet({service: SERVICE, resource: `/budgets/resource/${resourceId}`, xhr}),
 }

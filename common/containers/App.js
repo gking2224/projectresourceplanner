@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
+import { getEnvConfig } from '../utils'
 import update from 'react-addons-update'
 
 import Header from '../components/Header'
@@ -11,7 +12,7 @@ function mapStateToProps(state) {
   return {
     activeItem: state.menu.activeItem,
     staticRefData: state.staticRefData,
-    sessionInfo: state.sessionInfo
+    sessionInfo: state.sessionInfo,
   }
 }
 

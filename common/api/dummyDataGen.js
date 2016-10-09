@@ -4,9 +4,10 @@ import { ServerAPI } from '.'
 
 const seedDatabase = () => {
   seedLocations().then(() =>
-    seedResources(60).then(() =>
-      console.log('seeded data')))
+    seedResources(60)
     .catch(err=>console.log(err))
+  )
+  .catch(err=>console.log(err))
 }
 const seedUsers = () => {
   const user = {

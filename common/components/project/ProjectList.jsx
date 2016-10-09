@@ -73,12 +73,16 @@ const ProjectList = React.createClass({
   // project list or placeholder
   renderProjectList() {
     const { projects } = this.props
+    console.log("render project list")
+    console.log(projects)
     if (!projects || projects.length === 0) {
       return <span>No projects</span>
     }
     else {
       return (
-        <ul>{projects.map(p => <ProjectListItem key={p._id} project={p} onDelete={this.deleteProject(p)} />)}</ul>
+        <ul>{Object.keys(projects).map(p =>
+          <ProjectListItem key={p} project={projects[p]} onDelete={this.deleteProject(projects[p])} />)}
+        </ul>
       )
     }
   },
@@ -97,7 +101,7 @@ const ProjectList = React.createClass({
 export {ProjectList} // exported for unit testing
 export default connect(
   state => ({
-    projects: state.model.projects.projectList,
+    projects: state.model.projects,
   }),
   dispatch => ({
     loadProjects: () => dispatch(ProjectActions.loadProjects()),

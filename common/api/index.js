@@ -1,4 +1,5 @@
-export * from './projectApi'
+export { default as ProjectApi } from './projectApi'
 export * from './serverApi'
 export * from './budgetApi'
+export { default as StaticData } from './staticData'
 import * as DummyDataGenerator from './dummyDataGen'

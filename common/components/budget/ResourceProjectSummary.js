@@ -6,6 +6,7 @@ import classNames from 'classnames'
 import { Link } from 'react-router'
 import { Paths } from '../../constants/paths'
 import { Utils } from '../../utils'
+import { BudgetActions } from '../../actions'
 
 import './Budget.scss'
 
@@ -23,37 +24,55 @@ const ResourceProjectSummary = React.createClass({
       defaultOnly: false,
       showForecast: true,
       showActuals: true,
-      budgets: this.props.budgets || []
+      budgets: {},
     }
   },
 
   shouldComponentUpdate: function (nextProps) {
-    return true
+    return (nextProps.budgets && nextProps.budget && nextProps.projects && nextProps.resource) !== undefined
   },
 
   componentWillReceiveProps: function (nextProps) {
-    this.setState(
-      update(this.state, {budgets: {$set: (nextProps.budgets || [])}}),
-      this.updateCurrentBudget.bind(this, nextProps))
-  },
+    const { params, loadResourceSummary, budgets, budget } = nextProps
 
-  updateCurrentBudget: function(props) {
-    const { currentBudget } = props
-    if (currentBudget) {
-      if (!currentBudget._id) {
-        this.setState(update(this.state, {budgets: {$push: [currentBudget]}}))
-      }
-      else if (currentBudget) {
-        const idx = this.state.budgets.findIndex( (b) => b._id === currentBudget._id)
-        this.setState(update(this.state, {budgets: {$splice: [[idx, 1, currentBudget]]}}))
-      }
+    // replace active budget with wip
+    const allBudgets = budgets
+    allBudgets[budget._id] = budget
+    if (budget._id === undefined) allBudgets['wip'] = budget
+
+    this.setState({budgets: allBudgets})
+
+    // this.setState(
+      // update(this.state, {currentBudget: {$set: params.budgetId}, budgets: {$set: (nextProps.budgets || [])}}),
+      // this.updateCurrentBudget.bind(this, nextProps))
+
+    if (this.props.params.resourceId !== nextProps.params.resourceId) {
+      loadResourceSummary(nextProps.params.resourceId)
     }
   },
 
-  componentDidMount: function() {
-    this.setState(
-      {budgets: this.props.budgets},
-      this.updateCurrentBudget.bind(this, this.props))
+  // updateCurrentBudget: function(props) {
+  //   const { currentBudget } = props
+  //   if (currentBudget) {
+  //     if (!currentBudget._id) {
+  //       this.setState(update(this.state, {budgets: {$push: [currentBudget]}}))
+  //     }
+  //     else if (currentBudget) {
+  //       const idx = this.state.budgets.findIndex( (b) => b._id === currentBudget._id)
+  //       this.setState(update(this.state, {budgets: {$splice: [[idx, 1, currentBudget]]}}))
+  //     }
+  //   }
+  // },
+
+  // componentDidMount: function() {
+  //   this.setState(
+  //     {budgets: this.props.budgets},
+  //     this.updateCurrentBudget.bind(this, this.props))
+  // },
+
+  componentWillMount: function() {
+    const { params, loadResourceSummary } = this.props
+    loadResourceSummary(params.resourceId)
   },
 
   render: function () {
@@ -124,9 +143,32 @@ const ResourceProjectSummary = React.createClass({
     const onShowActualsChange = () => this.setState({showActuals: this.actualsCheckbox.checked}, this.setTypes)
     return (
       <div>
-        <label><input ref={n=>this.defaultCheckbox = n} type="checkbox" onChange={onDefaultOnlyChange} checked={this.state.defaultOnly} />Show default budgets only</label>
-        <label><input ref={n=>this.forecastCheckbox = n} type="checkbox" onChange={onShowForecastChange} checked={this.state.showForecast} />Show Forecast</label>
-        <label><input ref={n=>this.actualsCheckbox = n} type="checkbox" onChange={onShowActualsChange} checked={this.state.showActuals} />Show Actuals</label>
+        <label>
+          <input
+            ref={n=>this.defaultCheckbox = n}
+            type="checkbox"
+            onChange={onDefaultOnlyChange}
+            checked={this.state.defaultOnly}
+          />
+          Show default budgets only
+        </label>
+        <label>
+          <input
+            ref={n=>this.forecastCheckbox = n}
+            type="checkbox"
+            onChange={onShowForecastChange}
+            checked={this.state.showForecast}
+          />
+          Show Forecast
+        </label>
+        <label>
+          <input ref={n=>this.actualsCheckbox = n}
+                 type="checkbox"
+                 onChange={onShowActualsChange}
+                  checked={this.state.showActuals}
+          />
+          Show Actuals
+        </label>
       </div>
     )
   },
@@ -168,7 +210,13 @@ const ResourceProjectSummary = React.createClass({
       [
         <td rowSpan={rowSpan} key={key+'_'+type}>{(type == 'forecast') ? 'Forecast' : 'Actuals'}</td>,
         ftes.map( (fte, m) =>
-          <td className={'fte'} rowSpan={rowSpan} key={key+'_'+type+'_'+m}>{(fte == "0") ? <span>&nbsp;</span> : fte}</td>)
+          <td className={'fte'} rowSpan={rowSpan} key={key+'_'+type+'_'+m}>
+            {(fte == "0") ?
+              <span>&nbsp;</span> :
+              fte
+            }
+          </td>
+        )
       ]
     )
   },
@@ -189,7 +237,7 @@ const ResourceProjectSummary = React.createClass({
     const { budgets } = this.state
     const { resource, projects } = this.props
     if (!budgets || !resource || !projects) return null
-    const years = [... new Set(budgets.map(b => b.year))]
+    const years = [... new Set(Object.keys(budgets).map(b => budgets[b].year))]
     let rv = []
     years.forEach((y) => rv = [...this.yearData({years:years.length}, y)])
     return rv
@@ -199,17 +247,18 @@ const ResourceProjectSummary = React.createClass({
 
     const { budgets } = this.state
     let b
-    if (year) b = [...new Set(budgets.filter(bb => bb.year === year))]
-    else if (project) b  = budgets.filter(bb => bb.project === project._id)
+    if (year) b = [...new Set(Object.keys(budgets).filter(bb => budgets[bb].year === year))]
+    else if (project) b = Object.keys(budgets).filter(bb => budgets[bb].projectId === project._id)
 
-    const rv = (this.state.defaultOnly) ? b.filter(b => (b.isDefault)) : b
+    let rv = (this.state.defaultOnly) ? b.filter(b => (b.isDefault)) : b
+    rv = rv.map(b => budgets[b])
     return rv
   },
 
   yearData: function(nums, year) {
     const { projects } = this.props
 
-    const bProjects = [...new Set(this.filterBudgets(year).map((b) => projects.find(p => p._id === b.project)))]
+    const bProjects = [...new Set(this.filterBudgets(year).map(b => projects[b.projectId]))]
     let expandNums = this.expandNums(nums, {year: this.yearRows(year, bProjects)});
     let rv = []
     bProjects.forEach((p, idx) => {
@@ -248,7 +297,7 @@ const ResourceProjectSummary = React.createClass({
   budgetRows: function(budget, roles) {
     const { resource } = this.props
 
-    const bRoles = roles || budget.roles.filter(r => r.resourceAllocations.filter(ra => ra.resourceId === resource._id).length > 0)
+    const bRoles = roles || budget.roles.filter(r => r.allocations.filter(ra => ra.resourceId === resource._id).length > 0)
     const rv = bRoles.reduce((t, r) =>
       t + this.roleRows(r), 0)
     return rv
@@ -256,7 +305,7 @@ const ResourceProjectSummary = React.createClass({
 
   roleRows: function(role) {
     const { resource } = this.props
-    const allocations = role.resourceAllocations.filter(ra => ra.resourceId === resource._id)
+    const allocations = role.allocations.filter(ra => ra.resourceId === resource._id)
     const rv = allocations.reduce((t, a) => t + this.allocationRows(a), 0)
     return rv
   },
@@ -268,7 +317,7 @@ const ResourceProjectSummary = React.createClass({
 
   budgetData: function(nums, budget, project, year) {
     const { resource } = this.props
-    const rRoles = budget.roles.filter(r => r.resourceAllocations.filter(ra => ra.resourceId === resource._id).length > 0)
+    const rRoles = budget.roles.filter(r => r.allocations.filter(ra => ra.resourceId === resource._id).length > 0)
     let expandNums = this.expandNums(nums, {budget: this.budgetRows(budget, rRoles)})
     let rv = []
     rRoles.forEach( (r, idx) => {
@@ -281,7 +330,7 @@ const ResourceProjectSummary = React.createClass({
 
   budgetRoleData: function(nums, role, budget, project, year) {
     const { resource } = this.props
-    const allocations = role.resourceAllocations.filter(ra => ra.resourceId === resource._id)
+    const allocations = role.allocations.filter(ra => ra.resourceId === resource._id)
     let expandNums = this.expandNums(nums, {role: this.roleRows(role)})
     let rv = []
     allocations.forEach( (a, idx) => {
@@ -321,7 +370,8 @@ const ResourceProjectSummary = React.createClass({
 
   locationName: function(locationId) {
     const { Locations } = this.context.RefData
-    return Locations.byId(locationId).name
+    const l = Locations.byId(locationId)
+    return l ? l.name : null
   },
 
   expandNums: function(nums, o) {
@@ -329,4 +379,19 @@ const ResourceProjectSummary = React.createClass({
   }
 })
 
-export { ResourceProjectSummary }
+export { ResourceProjectSummary } // for unit testing
+export default connect(
+  (state) => {
+    const budget = state.model.wip.budget || state.model.budgets[state.screens.budget.activeBudgetId]
+    return {
+      editing: (state.model.wip.budget !== null),
+      budget,
+      projects: state.model.projects,
+      budgets: state.model.budgets,
+      resource: state.staticRefData.resources[state.screens.budget.resourceId]
+    }
+  },
+  dispatch => ({
+    loadResourceSummary: resourceId => dispatch(BudgetActions.loadResourceSummary(resourceId)),
+  })
+)(ResourceProjectSummary)

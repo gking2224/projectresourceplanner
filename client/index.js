@@ -12,11 +12,12 @@ import { getInitialState } from '../common/api/initialState'
 import App from '../common/containers/App'
 import Projects from '../common/containers/Projects'
 import Project from '../common/components/project/Project'
+import ResourceProjectSummary from '../common/components/budget/ResourceProjectSummary'
 import ProjectList from '../common/components/project/ProjectList'
 import Budget from '../common/components/budget/Budget'
 import Budgets from '../common/containers/Budgets'
 
-getInitialState().then(state => {
+getInitialState().then((state) => {
 
   const store = configureStore(state)
   const rootElement = document.getElementById('app')
@@ -29,9 +30,13 @@ getInitialState().then(state => {
             <Route path="/projects/:projectId" component={Project} />
           </Route>
           <Route path={Paths.Budget.index()} component={Budgets}>
-            <Route path={Paths.Budget.new(":projectId", ":year")} component={Budget} />
-            <Route path={Paths.Budget.view(":budgetId")} component={Budget} />
-            <Route path={Paths.Budget.viewWithResource(":budgetId", ":resourceId")} component={Budget} />
+            <Route path={Paths.Budget.new(':projectId', ':year')} component={Budget} />
+            <Route path={Paths.Budget.view(':budgetId')} component={Budget}>
+              <Route
+                path={Paths.Budget.viewWithResource(':budgetId', ':resourceId')}
+                component={ResourceProjectSummary}
+              />
+            </Route>
           </Route>
         </Route>
       </Router>
