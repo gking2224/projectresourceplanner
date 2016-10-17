@@ -64,8 +64,8 @@ const keyById = (c) => {
 export function getInitialState() {
 
   return new Promise((fulfill, reject) => {
-    StaticData.getResources().then(r => {
-      StaticData.getLocations().then(l => {
+    StaticData.getResources().then( ({response: r}) => {
+      StaticData.getLocations().then( ({response: l}) => {
         const is = initialState()
         const state = Object.assign(is, {
           model: Object.assign(is.model, {}),

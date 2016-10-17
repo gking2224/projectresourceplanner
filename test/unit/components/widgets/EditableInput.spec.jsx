@@ -24,7 +24,6 @@ describe('EditableInput', () => {
   it('should display its text in an <input> when not readonly', () => {
     const value = 'abc';
     const component = shallow(<EditableInput initialReadonly={false} initialContent={value} />)
-    console.log(component.debug())
     expect(component).to.have.exactly(1).descendants(INPUT)
     expect(component.find(INPUT)).to.have.value(value)
     expect(component).to.not.have.descendants(SPAN)

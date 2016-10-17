@@ -14,18 +14,16 @@ describe('projects reducer', () => {
     const stateAfter = projects(stateBefore, NULL_ACTION)
 
     expect(stateAfter).to.exist
-    expect(stateAfter.projectList).to.exist
   })
 
   it(`should handle ${ActionTypes.PROJECT_SAVED} action`, () => {
     const stateBefore = {
-      projectList: [],
     }
     const newProjectName = 'New Projddddect'
     const project = { _id: '123', name: newProjectName }
     const action = ProjectActions.projectSaved({ project })
     const expectedAfter = {
-      projectList: [project],
+      123: {_id: '123', name: newProjectName}
     }
 
     deepFreeze(stateBefore)
@@ -38,13 +36,11 @@ describe('projects reducer', () => {
   it(`should handle ${ActionTypes.PROJECT_DELETED} action`, () => {
     const projectName = 'a'
     const stateBefore = {
-      addingNewProject: null,
-      projectList: [projectName],
+      123: projectName
     }
-    const action = ProjectActions.projectDeleted(projectName)
+    const action = ProjectActions.projectDeleted({projectId: 123})
     const expectedAfter = {
-      addingNewProject: null,
-      projectList: [],
+      123: undefined
     }
 
     deepFreeze(stateBefore)

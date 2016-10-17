@@ -1,10 +1,9 @@
 import React, { Component, PropTypes } from 'react'
 import { Link } from 'react-router'
-import update from 'react-addons-update'
 
 import { Utils } from '../../utils'
 
-export const PermissionedLink = (props) => {
+const PermissionedLink = (props) => {
 
   const { permission, sessionInfo, children } = props
   const linkProps = Object.assign({}, props)
@@ -18,3 +17,4 @@ export const PermissionedLink = (props) => {
   )
 
 }
+export default PermissionedLink

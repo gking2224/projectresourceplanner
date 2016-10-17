@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import pd from 'react-prevent-default'
 import ContextMenu from './ContextMenu'
 
-export const ContextMenuWrapper = React.createClass({
+const ContextMenuWrapper = React.createClass({
 
   statics: {
 
@@ -149,3 +149,4 @@ export const ContextMenuWrapper = React.createClass({
   }
 
 })
+export default ContextMenuWrapper

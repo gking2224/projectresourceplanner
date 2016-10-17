@@ -10,37 +10,29 @@ datastore.loadDatabase(errHandler)
 
 const SERVICE = 'budgets'
 
-export const BudgetAPI = {
+const BudgetApi = {
 
-  getProjectBudgets: (projectId, xhr) =>
-    Server.doGet({service: SERVICE, resource: `/budgets/project/${projectId}`, xhr}),
+  getProjectBudgets: (projectId, sessionInfo, xhr) =>
+    Server.doGet({service: SERVICE, resource: `/budgets/project/${projectId}`, sessionInfo, xhr}),
 
-  getBudgets: xhr => Server.doGet({service: SERVICE, resource: '/budgets', xhr}),
+  getBudgets: ( sessionInfo, xhr ) => Server.doGet({service: SERVICE, resource: '/budgets', sessionInfo, xhr}),
 
-  getBudget: (budgetId, xhr) => Server.doGet({service: SERVICE, resource: `/budgets/${budgetId}`, xhr}),
+  getBudget: (budgetId, sessionInfo, xhr) => Server.doGet({service: SERVICE, resource: `/budgets/${budgetId}`, sessionInfo, xhr}),
 
-  saveBudget: (budget, xhr) => {
+  saveBudget: (budget, sessionInfo, xhr) => {
     let resource = '/budgets'
     if (budget._id) {
       resource = `${resource}/${budget._id}`
-      return Server.doPut({service:SERVICE, resource, body: budget, xhr})
+      return Server.doPut({service: SERVICE, resource, body: budget, sessionInfo, xhr})
     }
     else {
-      return Server.doPost({service:SERVICE, resource, body: budget, xhr})
+      return Server.doPost({service: SERVICE, resource, body: budget, sessionInfo, xhr})
     }
   },
-  deleteBudget: (budgetId) => Server.doDelete({service: SERVICE, resource: `budgets/${budgetId}`, xhr}),
+  deleteBudget: (budgetId, sessionInfo, xhr) =>
+    Server.doDelete({service: SERVICE, resource: `budgets/${budgetId}`, sessionInfo, xhr}),
 
-  setDefault: ({budgetId, isDefault}) => {
-    return new Promise((fulfill, reject)=> {
-      datastore.update({_id: budgetId}, {$set: {isDefault: isDefault}}, (err, n) => {
-        if (err) reject(err)
-        else if (n !== 1) reject("num deleted != 1")
-        else fulfill()
-      })
-    })
-  },
-
-  getBudgetsReferencingResource: (resourceId, xhr) =>
-    Server.doGet({service: SERVICE, resource: `/budgets/resource/${resourceId}`, xhr}),
+  getBudgetsReferencingResource: (resourceId, sessionInfo, xhr) =>
+    Server.doGet({service: SERVICE, resource: `/budgets/resource/${resourceId}`, sessionInfo, xhr})
 }
+export default BudgetApi

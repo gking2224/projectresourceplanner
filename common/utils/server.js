@@ -3,8 +3,6 @@ import XMLHttpRequest from 'xmlhttprequest'
 
 import { envConfig } from '../utils/envConfig'
 
-
-
 const constructUrl = (service, resource, params) => {
 
   const config = envConfig().services[service]
@@ -17,22 +15,27 @@ const constructUrl = (service, resource, params) => {
   return url
 }
 
-
-
-const callService = ({service, resource, xhr = new XMLHttpRequest.XMLHttpRequest(), method = 'GET', body, params = {}}) => {
+const callService = ({service, sessionInfo, resource, xhr = new XMLHttpRequest.XMLHttpRequest(), method = 'GET', body = false, params = {}}) => {
   return new Promise((fulfill, reject) => {
     const url = constructUrl(service, resource, params)
     console.log(`${method}: ${url}`)
+    body && console.log(body)
     xhr.open(method, url, true)
     xhr.setRequestHeader('Accept', 'application/json')
     xhr.setRequestHeader('Content-Type', 'application/json')
+    if (sessionInfo && sessionInfo.securityToken) {
+      xhr.setRequestHeader('Authentication', sessionInfo.securityToken)
+    }
     xhr.onreadystatechange = () => {
       if (xhr.readyState === xhr.DONE) {
-        if (xhr.status === 200) {
-          fulfill(JSON.parse(xhr.responseText))
+        const status = xhr.status
+        const responseText = xhr.responseText
+        const response = responseText ? JSON.parse(responseText) : null
+        if (status >= 200 && status < 300) {
+          setTimeout(() => fulfill({status, response}), 300)
         }
         else {
-          reject({status: xhr.status, err: xhr.responseText})
+          setTimeout(() => reject(response), 300)
         }
       }
     }

@@ -7,10 +7,10 @@ import classNames from 'classnames'
 import { Permissions, Constants, Paths } from '../../constants'
 import { BudgetActions, ProjectActions, GlobalActions } from '../../actions'
 import { EditableInput } from '../widgets'
-import BudgetRoleRow from './BudgetRoleRow'
-import BudgetDetail from './BudgetDetail'
-import BudgetSummary from './BudgetSummary'
+import { BudgetRoleRow, BudgetDetail, BudgetSummary } from '.'
+import { sessionAware } from '../hoc'
 import { Utils, BudgetUtils } from '../../utils'
+import { Loading } from '../common'
 
 import './Budget.scss'
 
@@ -34,6 +34,8 @@ const Budget = React.createClass({
     confirmCancel: PropTypes.func,
     editBudget: PropTypes.func,
     save: PropTypes.func,
+    withSession: PropTypes.func,
+    isPermissioned: PropTypes.func,
 
     // UI
     editing: PropTypes.bool,
@@ -44,50 +46,37 @@ const Budget = React.createClass({
 
   contextTypes: {
     router: PropTypes.object,
-    getSessionInfo: PropTypes.func,
     staticRefData: PropTypes.object,
     RefData: PropTypes.object,
   },
 
   getInitialState () {
 
-    const sessionInfoAndUnsubscribe = this.context.getSessionInfo(this.sessionInfoUpdated)
-    const sessionInfo = sessionInfoAndUnsubscribe[0]
     return {
-      sessionInfo,
-      unsubscribe: sessionInfoAndUnsubscribe[1],
       viewFteValue: false,
       filters: {},
-      permissioned: Utils.hasPermission(sessionInfo, Permissions.Budget.EDIT),
+      canEdit: this.props.isPermissioned(Permissions.Budget.EDIT),
       readonly: true,
       dirty: false,
     }
   },
 
   componentDidMount() {
-    const { params, createNewBudget, loadBudget} = this.props
-
-    if (params && params.projectId && params.year) {
-      // url indicates new budget
-      createNewBudget(params.projectId, params.year)
-    } else if (params && params.budgetId) {
-      // load specific budget
-      loadBudget(params.budgetId)
-    }
+    this.loadData()
   },
 
   componentWillReceiveProps(nextProps) {
-    const { params, loadProject, loadBudget, budget } = nextProps
+    const { params, loadProject, loadBudget, budget, withSession } = nextProps
 
     if (budget && params && Number(params.budgetId) !== budget._id) {
       // switch to different budget from parameter
-      loadBudget(params.budgetId)
+      withSession(s => loadBudget(params.budgetId, s))
     }
     if (nextProps.budget && (!nextProps.project || nextProps.project._id !== nextProps.budget.projectId)) {
-      loadProject(nextProps.budget.projectId)
+      withSession(s => loadProject(nextProps.budget.projectId, s))
     }
     this.setState({
-      readonly: !nextProps.editing || !this.state.permissioned
+      readonly: !nextProps.editing || !this.state.canEdit
     })
   },
 
@@ -98,7 +87,6 @@ const Budget = React.createClass({
   componentDidUpdate() {},
 
   componentWillUnmount() {
-    this.state.unsubscribe()
   },
 
   fireUpdates(stateSpec, budgetSpec) {
@@ -152,12 +140,26 @@ const Budget = React.createClass({
     }
   },
 
-  sessionInfoUpdated(sessionInfo) {
-    const permissioned = Utils.hasPermission(sessionInfo, Permissions.Budget.EDIT)
+  userSignedIn() {
+    const canEdit = this.props.isPermissioned(Permissions.Budget.EDIT)
     this.setState({
-      permissioned,
-      readonly: !this.props.editing || !permissioned
+      canEdit,
+      readonly: !this.props.editing || !canEdit
     })
+    this.loadData()
+  },
+
+  loadData() {
+    const { params, createNewBudget, loadBudget, withSession } = this.props
+
+    if (params && params.projectId && params.year) {
+      // url indicates new budget
+      createNewBudget(params.projectId, params.year)
+    }
+    else if (params && params.budgetId) {
+      // load specific budget
+      withSession(s => loadBudget(params.budgetId, s))
+    }
   },
 
   filtersInclude(role) {
@@ -242,7 +244,7 @@ const Budget = React.createClass({
   },
 
   renderBudget() {
-    const { budget } = this.props
+    const { budget, isPermissioned } = this.props
     const { readonly } = this.state
 
     return (
@@ -251,9 +253,9 @@ const Budget = React.createClass({
           {...this.props} readonly={readonly} yearUpdated={this.yearUpdated} nameUpdated={this.nameUpdated}
         />
 
-        {this.renderRoles()}
+        {budget.roles ? this.renderRoles() : <Loading text={'Loading budget detail...'} />}
         {this.renderBudgetActionButtons()}
-        <BudgetSummary budget={budget} />
+        {isPermissioned(Permissions.Budget.VIEW_FINANCIALS) && <BudgetSummary budget={budget} />}
       </div>
     )
   },
@@ -386,20 +388,23 @@ const Budget = React.createClass({
   },
 
   renderBudgetActionButtons() {
-    const { viewFteValue, dirty, readonly, permissioned } = this.state
-    const { budget } = this.props
+    const { viewFteValue, dirty, readonly, canEdit } = this.state
+    const { budget, editing, isPermissioned } = this.props
 
     const duplicate = () => {
       this.save(Object.assign({}, clone(this.state.budget), {
         _id: undefined, name: `Copy of ${budget.name}`, isDefault: false}))
     }
     return (<div>
-      {dirty && !readonly && <button onClick={this.save(budget)}>Save</button>}
-      {!dirty && permissioned && <button onClick={this.edit(budget)}>Edit</button>}
-      <button onClick={this.cancel}>Cancel</button>
-      <button onClick={this.toggleFTEValues}>View {(viewFteValue) ? 'FTEs' : 'Values'}</button>
-      {!readonly && <button onClick={duplicate}>Duplicate</button>}
+      {isPermissioned(Permissions.Budget.VIEW_FINANCIALS) &&
+        <button onClick={this.toggleFTEValues}>View {(viewFteValue) ? 'FTEs' : 'Values'}</button>
+      }
+      {isPermissioned(Permissions.Budget.CREATE) && !readonly && <button onClick={duplicate}>Duplicate</button>}
       <button onClick={this.clearFilters}>Clear filters</button>
+      <br />
+      {canEdit && !editing && <button onClick={this.edit(budget)}>Edit</button>}
+      <button onClick={this.cancel}>Cancel</button>
+      {dirty && !readonly && <button onClick={this.save(budget)}>Save</button>}
     </div>)
   },
 
@@ -414,11 +419,13 @@ const Budget = React.createClass({
   },
 
   save(budget) {
-    return () => this.props.save(budget, saved => this.setState({dirty: !saved}))
+    const { withSession, save } = this.props
+    return () => withSession(s => save(budget, saved => this.setState({dirty: !saved}), s))
   },
 
   edit(budget) {
-    return () => this.props.editBudget(budget._id)
+    const { withSession, editBudget } = this.props
+    return () => withSession(s => editBudget(budget._id, s))
   },
 
   cancel() {
@@ -453,13 +460,12 @@ export default connect(
     }
   },
   dispatch => ({
-    save: (budget, callback) => dispatch(BudgetActions.saveBudget(budget, callback)),
+    save: (budget, callback, s) => dispatch(BudgetActions.saveBudget(budget, callback, s)),
     confirmCancel: dialog => dispatch(GlobalActions.displayDialogYesNo(dialog)),
-    loadBudget: budgetId => dispatch(BudgetActions.loadBudget(budgetId)),
-    loadProject: projectId => dispatch(ProjectActions.loadProject(projectId)),
-    editBudget: budgetId => dispatch(BudgetActions.editBudget(budgetId)),
+    loadBudget: (budgetId, s) => dispatch(BudgetActions.loadBudget(budgetId, s)),
+    loadProject: (projectId, s) => dispatch(ProjectActions.loadProject(projectId, s)),
+    editBudget: (budgetId, s) => dispatch(BudgetActions.editBudget(budgetId, s)),
     updateBudget: budget => dispatch(BudgetActions.updateBudget({budget})),
-    createNewBudget: (projectId, year) => dispatch(BudgetActions.createNewBudget(projectId, year)),
-    // loadResourceSummary: resourceId => dispatch(BudgetActions.loadResourceSummary(resourceId)),
+    createNewBudget: (projectId, year) => dispatch(BudgetActions.createNewBudget(projectId, year))
   })
-)(Budget)
+)(sessionAware(Budget))

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import keycode from 'keycode'
 import classNames from 'classnames'
 
-export const EditableInput = React.createClass({
+const EditableInput = React.createClass({
 
   input: null,
 
@@ -222,3 +222,4 @@ export const EditableInput = React.createClass({
 
 })
 
+export default EditableInput

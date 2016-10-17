@@ -19,6 +19,12 @@ export const ReducerUtils = {
     return update(state, updateSpec)
   },
 
+  removeEntityWithId: (state, id) => {
+
+    if (!id) return state
+    return update(state, {[id]: {$set: undefined}})
+  },
+
 }
 
 export default ReducerUtils

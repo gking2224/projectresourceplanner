@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import sinon from 'sinon'
 import { ProjectActions } from '../../../common/actions'
-import { ProjectAPI } from '../../../common/api'
+import { ProjectApi } from '../../../common/api'
 import { ActionTypes } from '../../../common/constants'
 import { continueAfterConfirm, expectActionWithServerCallNotification } from '../../utils/test-async-utils'
 import {fakeServer as fs} from '../../utils/fakeServer'
@@ -26,7 +26,7 @@ describe('project async actions', () => {
     const project = {_id: 123, name: 'deleted project'}
     const dispatch = sinon.spy()
 
-    const stub = sinon.stub(ProjectAPI, 'deleteProject')
+    const stub = sinon.stub(ProjectApi, 'deleteProject')
     stub.resolves()
     ProjectActions.deleteProject(project)(dispatch)
     const expectedAction = {
@@ -42,7 +42,7 @@ describe('project async actions', () => {
   it('should handle saveNewProject action', (done) => {
     const project = {_id: 123, name: 'New Project'}
     const dispatch = sinon.spy()
-    const stub = sinon.stub(ProjectAPI, 'saveProject')
+    const stub = sinon.stub(ProjectApi, 'saveProject')
     stub.resolves(project)
     ProjectActions.saveNewProject(project.name)(dispatch)
     const expectedAction = {

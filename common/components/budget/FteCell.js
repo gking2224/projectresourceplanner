@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import { ContextMenuWrapper, EditableInput } from '../widgets'
 import classNames from 'classnames'
 
-export const FteCell = ({
+import { ContextMenuWrapper, EditableInput } from '../widgets'
+
+const FteCell = ({
     fte, rate, edit, readonly, editNext, editPrevious, editDown, editUp, className,
     isEditing, onCancel, onChange, fillRight, fillLeft, viewFteValue, split
 }) => {
@@ -36,3 +37,5 @@ export const FteCell = ({
     </td>
   )
 }
+
+export default FteCell

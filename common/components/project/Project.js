@@ -1,32 +1,40 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router'
 
 import { ProjectActions, BudgetActions, GlobalActions } from '../../actions'
 import { CollapseableSection, ToggleTypes } from '../widgets'
-import { ProjectBudgetList } from './ProjectBudgetList'
+import { ProjectBudgetList } from '.'
+import { Loading } from '../common'
+
+import { sessionAware } from '../hoc'
 
 const Project = React.createClass({
 
   getInitialState: function() {
     return {
-      reloadBudgets: true,
+      reloadBudgets: true
     }
   },
 
   contextTypes: {
-    router: PropTypes.object,
-    sessionInfo: PropTypes.object,
+    router: PropTypes.object
   },
 
   componentWillMount: function() {
-    const { budgets, project } = this.props
+    const { budgets } = this.props
     this.filterBudgets(budgets)
   },
 
+  userSignedIn() {
+    this.loadProject()
+  },
+
+  shouldComponentUpdate() {
+    return true
+  },
+
   componentDidMount: function() {
-    const { params, loadProject } = this.props
-    loadProject(params.projectId)
+    this.loadProject()
     this.setState({reloadBudgets: true})
   },
 
@@ -66,20 +74,37 @@ const Project = React.createClass({
         <h2>{project.name}</h2>
 
         <CollapseableSection toggleType={ToggleTypes.PLUS_MINUS} onOpen={this.lazyLoadBudgets} label={'View Budgets'}>
-          <ProjectBudgetList sessionInfo={sessionInfo} budgets={budgets} addNewBudget={this.addNewBudget} toggleDefault={this.toggleDefaultBudget}/>
+          {(budgets) ?
+            <ProjectBudgetList
+              sessionInfo={sessionInfo}
+              budgets={budgets}
+              addNewBudget={this.addNewBudgetFx}
+              toggleDefault={this.toggleDefaultBudgetFx}
+            /> :
+            <Loading image={false} text={'Loading budgets...'} />
+          }
         </CollapseableSection>
       </div>
     )
   },
 
-  lazyLoadBudgets: function() {
-    const { project } = this.props
-
-    if (!this.props.budgets || this.state.reloadBudgets) this.props.loadBudgets(project._id)
-    this.setState({reloadBudgets: false})
+  loadProject() {
+    const { loadProject, withSession } = this.props
+    withSession(s => loadProject(this.props.params.projectId, s))
   },
 
-  addNewBudget: function(year) {
+  lazyLoadBudgets: function() {
+    const { project, withSession } = this.props
+
+    if (!this.props.budgets || this.state.reloadBudgets) {
+      this.setState({budgets: false}, () => {
+        withSession(s => this.props.loadBudgets(project._id, s))
+        this.setState({reloadBudgets: false})
+      })
+    }
+  },
+
+  addNewBudgetFx: function(year) {
     return () => {
       const {project} = this.props
       const {router} = this.context
@@ -88,10 +113,10 @@ const Project = React.createClass({
     }
   },
 
-  toggleDefaultBudget: function(year, yearBudgets) {
+  toggleDefaultBudgetFx: function(year, yearBudgets) {
+    const { withSession, userWarning, saveBudget } = this.props
     return (b) => {
       return () => {
-        const { userWarning, saveBudget } = this.props
         if (b.isDefault) {
           // try to unset
           userWarning('There must be one default budget per year')
@@ -107,13 +132,13 @@ const Project = React.createClass({
         }
 
         b.isDefault = !b.isDefault
-        saveBudget(b)
+        withSession(s => saveBudget(b, s))
       }
     }
   },
 })
 
-export {Project} // for unit testing
+export { Project } // for unit testing
 
 export default connect(
   state => ({
@@ -121,10 +146,10 @@ export default connect(
     budgets: state.model.budgets,
   }),
   dispatch => ({
-    saveBudget: budget => dispatch(BudgetActions.saveBudget(budget)),
-    loadProject: projectId => dispatch(ProjectActions.loadProject(projectId)),
-    loadBudgets: projectId => dispatch(BudgetActions.loadProjectBudgets(projectId)),
+    saveBudget: (budget, s) => dispatch(BudgetActions.saveBudget(budget, s)),
+    loadProject: (projectId, s) => dispatch(ProjectActions.loadProject(projectId, s)),
+    loadBudgets: (projectId, s) => dispatch(BudgetActions.loadProjectBudgets(projectId, s)),
     // setDefault: (budget, isDefault) => dispatch(BudgetActions.setDefault({budgetId, isDefault})),
     userWarning: message => dispatch(GlobalActions.userWarning(message))
   })
-)(Project)
+)(sessionAware(Project))

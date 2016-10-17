@@ -14,4 +14,4 @@ const MonthSelect = (props) => {
     <EditableDropDown labels={Utils.months()} values={Utils.month_Indices()} initialValue={initialMonth} {...newProps} />
   )
 }
-export { MonthSelect }
+export default MonthSelect

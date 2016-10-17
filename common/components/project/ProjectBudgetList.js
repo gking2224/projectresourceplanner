@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import BudgetListItem from './BudgetListItem'
+import { BudgetListItem } from '.'
 import { Utils } from '../../utils'
 import { Permissions } from '../../constants'
 
@@ -57,4 +57,4 @@ const renderAddButton = (year, addNewBudget) => {
 ProjectBudgetList.contextTypes = {
   getSessionInfo: PropTypes.func,
 }
-export { ProjectBudgetList }
+export default ProjectBudgetList

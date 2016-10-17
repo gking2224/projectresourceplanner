@@ -1,5 +1,6 @@
 export { default as ProjectApi } from './projectApi'
 export * from './serverApi'
-export * from './budgetApi'
+export { default as BudgetApi } from './budgetApi'
+export { default as SecurityApi } from './securityApi'
 export { default as StaticData } from './staticData'
 import * as DummyDataGenerator from './dummyDataGen'

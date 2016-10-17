@@ -43,4 +43,4 @@ const CollapseableSection = React.createClass({
   },
 
 })
-export {CollapseableSection}
+export default CollapseableSection

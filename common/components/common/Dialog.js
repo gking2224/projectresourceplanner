@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import { GlobalActions } from '../../common/actions'
+import { GlobalActions } from '../../actions'
 
-let Dialog = ({dialog, clear}) => {
+const Dialog = ({dialog, clear}) => {
   const {title, message, type, visible, callback, cancel} = dialog
   if (!visible) return null
   else return (

@@ -1,4 +1,4 @@
-import * as ActionTypes from '../constants/actionTypes'
+import { ActionTypes } from '../constants'
 
 const dialog = (
   state = {},

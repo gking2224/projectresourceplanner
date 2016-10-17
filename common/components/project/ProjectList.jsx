@@ -5,51 +5,30 @@ import { ProjectActions } from '../../actions'
 import { Permissions } from '../../constants'
 import ProjectListItem from './ProjectListItem'
 import AddProject from './AddProject'
-import { Utils } from '../../utils'
+import { sessionAware } from '../hoc'
 
 const ProjectList = React.createClass({
 
-  contextTypes: {
-    getSessionInfo: PropTypes.func,
-  },
-
   getInitialState() {
-    const sessionInfoAndUnsubscribe = this.context.getSessionInfo(this.sessionInfoUpdated)
     return {
-      addingNew: false,
-      sessionInfo: sessionInfoAndUnsubscribe[0],
-      unsubscribe: sessionInfoAndUnsubscribe[1],
+      addingNew: false
     }
   },
 
   componentDidMount() {
-    const { loadProjects } = this.props
-    loadProjects()
+    this.loadProjects()
   },
 
   componentWillReceiveProps(nextProps, nextContext) {
   },
 
-  componentWillUnmount() {
-    this.state.unsubscribe()
+  userSignedIn() {
+    this.loadProjects()
   },
 
-  sessionInfoUpdated(sessionInfo) {
-
-    this.setState({sessionInfo})
-  },
-
-  render() {
-    const { sessionInfo } = this.state
-
-    return (
-      <div id="projectList">
-        <h2>Projects</h2>
-        {this.renderProjectList()}
-        {!this.state.addingNew && Utils.hasPermission(sessionInfo, Permissions.Project.ADD) && this.newProjectButton()}
-        {this.state.addingNew && Utils.hasPermission(sessionInfo, Permissions.Project.ADD) && this.newProjectForm()}
-      </div>
-    )
+  loadProjects() {
+    const { loadProjects, withSession } = this.props
+    withSession(s => loadProjects(s))
   },
 
   newProjectButton() {
@@ -70,11 +49,32 @@ const ProjectList = React.createClass({
     return (<AddProject onSave={this.saveProject} onCancel={this.hideNewProjectForm} />)
   },
 
+  deleteProject(project) {
+    const { deleteProject, withSession } = this.props
+    return () => withSession(s => deleteProject(project, 2))
+  },
+
+  saveProject(name) {
+    const { saveProject, withSession } = this.props
+    withSession(s => saveProject(name, 2))
+    this.hideNewProjectForm()
+  },
+
+  render() {
+    const { isPermissioned } = this.props
+    return (
+      <div id='projectList'>
+        <h2>Projects</h2>
+        {this.renderProjectList()}
+        {!this.state.addingNew && isPermissioned(Permissions.Project.ADD) && this.newProjectButton()}
+        {this.state.addingNew && isPermissioned(Permissions.Project.ADD) && this.newProjectForm()}
+      </div>
+    )
+  },
+
   // project list or placeholder
   renderProjectList() {
     const { projects } = this.props
-    console.log("render project list")
-    console.log(projects)
     if (!projects || projects.length === 0) {
       return <span>No projects</span>
     }
@@ -86,16 +86,6 @@ const ProjectList = React.createClass({
       )
     }
   },
-
-  deleteProject(project) {
-    return () => this.props.deleteProject(project)
-  },
-
-  saveProject(name) {
-
-    this.props.saveProject(name)
-    this.hideNewProjectForm()
-  },
 })
 
 export {ProjectList} // exported for unit testing
@@ -104,8 +94,8 @@ export default connect(
     projects: state.model.projects,
   }),
   dispatch => ({
-    loadProjects: () => dispatch(ProjectActions.loadProjects()),
-    saveProject: name => dispatch(ProjectActions.saveNewProject(name)),
-    deleteProject: project => dispatch(ProjectActions.deleteProject(project)),
+    loadProjects: s => dispatch(ProjectActions.loadProjects(s)),
+    saveProject: (name, s) => dispatch(ProjectActions.saveNewProject(name)),
+    deleteProject: (project, s) => dispatch(ProjectActions.deleteProject(project, s)),
   })
-)(ProjectList)
+)(sessionAware(ProjectList))

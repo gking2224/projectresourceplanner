@@ -11,26 +11,26 @@ const ProjectActions = {
   projectDeleted: createAction(ActionTypes.PROJECT_DELETED),
   projectSaved: createAction(ActionTypes.PROJECT_SAVED),
 
-  loadProject: (projectId, xhr) => {
+  loadProject: (projectId, sessionInfo, xhr) => {
     const msg = `loadProject.${projectId}`
     return (dispatch) => {
       Utils.doRemoteAction(dispatch)({
         msg,
-        remoteAction: () => ProjectApi.loadProject(projectId, xhr),
-        successAC: projects => ProjectActions.projectsLoaded({ projectId, projects }),
-        errorAC: err => dispatch(GlobalActions.error(err)),
+        remoteAction: () => ProjectApi.loadProject(projectId, sessionInfo, xhr),
+        successAC: ({response: projects}) => ProjectActions.projectsLoaded({ projectId, projects }),
+        errorAC: err => dispatch(GlobalActions.remoteError(err)),
       })
     }
   },
 
-  loadProjects: () => {
+  loadProjects: (sessionInfo) => {
     const msg = 'loadProjects'
     return (dispatch) => {
       Utils.doRemoteAction(dispatch)({
         msg,
-        remoteAction: () => ProjectApi.loadProjects(),
-        successAC: projects => ProjectActions.projectsLoaded({ projectId: null, projects }),
-        errorAC: err => dispatch(GlobalActions.error(err)),
+        remoteAction: () => ProjectApi.loadProjects(sessionInfo),
+        successAC: ({response: projects}) => ProjectActions.projectsLoaded({ projectId: null, projects }),
+        errorAC: err => dispatch(GlobalActions.remoteError(err)),
       })
     }
   },
@@ -41,20 +41,20 @@ const ProjectActions = {
       Utils.doRemoteAction(dispatch)({
         msg,
         remoteAction: () => ProjectApi.saveProject({ name }),
-        successAC: project => ProjectActions.projectSaved({ project }),
-        errorAC: err => dispatch(GlobalActions.error(err)),
+        successAC: ({response: project}) => ProjectActions.projectSaved({ project }),
+        errorAC: err => dispatch(GlobalActions.remoteError(err)),
       })
     }
   },
 
-  deleteProject: (project) => {
+  deleteProject: (project, sessionInfo, xhr) => {
     const msg = `Deleting project ${project._id}`
     return (dispatch) => {
       const title = 'Confirm'
       const callback = () => {
         Utils.doRemoteAction(dispatch)({
           msg,
-          remoteAction: () => ProjectApi.deleteProject(project._id),
+          remoteAction: () => ProjectApi.deleteProject(project._id, sessionInfo, xhr),
           successAC: () => ProjectActions.projectDeleted({ projectId: project._id }),
         })
       }

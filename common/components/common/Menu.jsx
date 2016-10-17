@@ -2,8 +2,8 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
-import { MenuActions } from '../actions'
-import { ClickableText } from './widgets'
+import { SecurityActions } from '../../actions'
+import { ClickableText } from '../widgets'
 
 
 const renderSignIn = (signIn) => {
@@ -17,7 +17,7 @@ const renderSignOut = (sessionInfo, signOut) => {
   return (
     <div id={'sign-out'}>
       <span>Logged in as {sessionInfo.loggedOnUser.firstName} {sessionInfo.loggedOnUser.surname}</span>
-      <ClickableText action="signOut" onClick={signOut}>Sign out</ClickableText>
+      <ClickableText action="signOut" onClick={() => signOut(sessionInfo)}>Sign out</ClickableText>
     </div>
   )
 }
@@ -68,8 +68,8 @@ const Menu = React.createClass({
 })
 
 const dispatchToProps = dispatch => ({
-  signOut: () => dispatch(MenuActions.signOut()),
-  signIn: () => dispatch(MenuActions.signIn()),
+  signOut: s => dispatch(SecurityActions.signOut(s.securityToken)),
+  signIn: () => dispatch(SecurityActions.displaySignIn({})),
 })
 
 const stateToProps = state => ({

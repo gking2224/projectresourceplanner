@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import clone from 'clone'
 
 import { BudgetUtils } from '../../utils'
-import { FteCell } from './FteCell'
+import { FteCell } from '.'
 import { EditableInput, EditableDropDown, DeleteControl } from '../widgets'
 import { default as helper } from './BudgetNavigationFunctions'
 
@@ -93,6 +93,7 @@ class BudgetRoleRow extends React.Component {
 
   duplicateAllocation = allocationIdx => () => {
     const dupe = clone(this.props.role.allocations[allocationIdx])
+    dupe._id = null
 
     this.setState(update(this.state, {modifyingAllocations: {$set: true}}),
       this.updatedFunc({allocations: {$splice: [[allocationIdx, 0, dupe]]}}))
@@ -255,7 +256,6 @@ class BudgetRoleRow extends React.Component {
               initialContent={allocation.rate}
               allowInlineEdit={!readonly}
               onComplete={this.allocationFieldUpdated(allocationIdx, 'rate')}
-              className={`forecast_rate_${allocationIdx}`}
             />
           </td>
         }
@@ -282,14 +282,16 @@ class BudgetRoleRow extends React.Component {
           />
         )}
         <td className={classNames('total', 'fte')}>{total}</td>
-        <td className={'comment'}>
+
+        {(type === 'forecast') &&
+        <td className={'comment'} rowSpan={2}>
           <EditableInput
-            initialContent={allocation[type].comment}
+            initialContent={allocation.comment}
             allowInlineEdit={!readonly}
-            onComplete={this.allocationFieldUpdated(allocationIdx, 'comment', type)}
-            className={`${type}_comment_${allocationIdx}`}
+            onComplete={this.allocationFieldUpdated(allocationIdx, 'comment')}
+            className={'allocation_comment'}
           />
-        </td>
+        </td>}
         {(type === 'forecast') &&
           <td rowSpan={2}>
             {!readonly && <DeleteControl onDelete={this.removeAllocation(allocationIdx)} />}

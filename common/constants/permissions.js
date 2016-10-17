@@ -1,15 +1,17 @@
 
 export const Permissions = {
   Project: {
-    ADD: 'project.add',
-    DELETE: 'project.delete',
-    VIEW_SUMMARY_ALL: 'project.view.summary',
-    VIEW_DETAIL: 'project.view.detail',
-    EDIT: 'project.edit'
+    ADD: 'CreateProject',
+    DELETE: 'DeleteProject',
+    VIEW_SUMMARY_ALL: 'ViewProjectSummary',
+    VIEW_DETAIL: 'ViewProjectDetail',
+    EDIT: 'EditProject'
   },
   Budget: {
-    DELETE: 'budget.delete',
-    EDIT: 'budget.edit',
-    VIEW_DETAIL: 'budget.view.detail'
+    DELETE: 'DeleteBudget',
+    EDIT: 'EditBudget',
+    VIEW_DETAIL: 'ViewBudgetDetail',
+    VIEW_FINANCIALS: 'ViewFinancials',
+    CREATE: 'CreateBudget'
   }
 }

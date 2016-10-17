@@ -14,4 +14,4 @@ const LabelledField = ({label, className, children, small, medium, large}) => {
   )
 }
 
-export { LabelledField }
+export default LabelledField
