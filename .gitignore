@@ -17,3 +17,5 @@ test/integration/
 build
 .gradle
 secret.properties
+test/simple
+test/simple2
