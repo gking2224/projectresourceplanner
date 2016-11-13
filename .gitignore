@@ -12,3 +12,5 @@ mochawesome-reports/
 test/.bak/
 test/config/
 test/integration/
+**/*-compiled.js
+**/*-compiled.js.map

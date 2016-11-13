@@ -8,7 +8,7 @@ import { Permissions, Constants, Paths } from '../../constants'
 import { BudgetActions, ProjectActions, GlobalActions } from '../../actions'
 import { EditableInput } from '../widgets'
 import { BudgetRoleRow, BudgetDetail, BudgetSummary } from '.'
-import { sessionAware } from '../hoc'
+import { sessionSubscriber } from '../hoc'
 import { Utils, BudgetUtils } from '../../utils'
 import { Loading } from '../common'
 
@@ -468,4 +468,4 @@ export default connect(
     updateBudget: budget => dispatch(BudgetActions.updateBudget({budget})),
     createNewBudget: (projectId, year) => dispatch(BudgetActions.createNewBudget(projectId, year))
   })
-)(sessionAware(Budget))
+)(sessionSubscriber(Budget))

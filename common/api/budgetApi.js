@@ -11,7 +11,6 @@ datastore.loadDatabase(errHandler)
 const SERVICE = 'budgets'
 
 const BudgetApi = {
-
   getProjectBudgets: (projectId, sessionInfo, xhr) =>
     Server.doGet({service: SERVICE, resource: `/budgets/project/${projectId}`, sessionInfo, xhr}),
 

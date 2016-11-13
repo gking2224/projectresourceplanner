@@ -1,6 +1,6 @@
 export * from './utilFunctions'
 export { default as BudgetUtils } from './budgetUtils'
-export * from './RefData'
+export { default as RefData } from './RefData'
 export * from './server'
 export { default as ReducerUtils } from './reducerUtils'
 export { default as StringUtils } from './stringUtils'

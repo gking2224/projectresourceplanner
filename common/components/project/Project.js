@@ -6,7 +6,7 @@ import { CollapseableSection, ToggleTypes } from '../widgets'
 import { ProjectBudgetList } from '.'
 import { Loading } from '../common'
 
-import { sessionAware } from '../hoc'
+import { sessionSubscriber } from '../hoc'
 
 const Project = React.createClass({
 
@@ -152,4 +152,4 @@ export default connect(
     // setDefault: (budget, isDefault) => dispatch(BudgetActions.setDefault({budgetId, isDefault})),
     userWarning: message => dispatch(GlobalActions.userWarning(message))
   })
-)(sessionAware(Project))
+)(sessionSubscriber(Project))

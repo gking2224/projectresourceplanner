@@ -2,79 +2,62 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import cookie from 'react-cookie'
 
-import { getEnvConfig, RefData } from '../utils'
-import { Header, SignIn, Footer, Dialog } from '../components/common'
-import { SecurityActions } from '../actions'
+import { RefData } from '../utils'
+import { Header, SignIn, Footer } from '../components/common'
+import { sessionListening } from '../components/hoc'
+import { SecurityActions, StaticDataActions } from '../actions'
+
+const TOKEN_COOKIE_NAME = '__securityToken'
 
 function mapStateToProps(state) {
   return {
     activeItem: state.menu.activeItem,
     staticRefData: state.staticRefData,
-    sessionInfo: state.sessionInfo,
     displaySignInForm: state.screens.signIn.displaySignInForm
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    validateToken: token => dispatch(SecurityActions.validate(token))
+    validateToken: token => dispatch(SecurityActions.validate(token)),
+    loadRefData: s => dispatch(StaticDataActions.seedRefData(s))
   }
 }
 
-class App extends Component {
-
-  constructor(props) {
-    super(props)
-    this.listenerId = 0
-    this.listeners = []
-    const c = cookie.load('token')
-    this.state = { tokenCookie: c }
-  }
+const App = React.createClass({
+  getInitialState() {
+    const c = cookie.load(TOKEN_COOKIE_NAME)
+    return {
+      tokenCookie: c
+    }
+  },
 
   getChildContext() {
     return {
       staticRefData: this.props.staticRefData,
-      RefData: RefData(this.props.staticRefData),
-      // addSessionInfoListener: listener => this.addSessionInfoListener(listener),
-      getSessionInfo: (listener) => {
-        return (listener) ?
-          [this.props.sessionInfo, this.addSessionInfoListener(listener)] :
-          this.props.sessionInfo
-      },
+      RefData: RefData(this.props.staticRefData)
     }
-  }
+  },
 
   componentDidMount() {
-    if (this.state.tokenCookie && !this.props.sessionInfo.loggedOnUser) {
+    if (this.state.tokenCookie) {
       this.props.validateToken(this.state.tokenCookie)
     }
-  }
+  },
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.state.tokenCookie && nextProps.sessionInfo && nextProps.sessionInfo.securityToken) {
-      const token = nextProps.sessionInfo.securityToken
-      this.setState({tokenCookie: token}, cookie.save('token', nextProps.sessionInfo.securityToken, { path: '/' }))
-    }
-    if (this.state.tokenCookie && !nextProps.sessionInfo.loggedOnUser) {
-      this.setState({tokenCookie: null}, () => cookie.save('token', null, { path: '/' }))
-    }
-    this.listeners.filter(s => s !== null).forEach(s =>
-      s.listener(nextProps.sessionInfo))
-  }
+  userSignedIn(sessionInfo) {
+    cookie.save(TOKEN_COOKIE_NAME, sessionInfo.securityToken, { path: '/' })
+    this.loadRefData(sessionInfo)
+  },
 
-  addSessionInfoListener(listener) {
-    const id = this.listenerId++
-    this.listeners.push({id, listener})
-    // listener(this.props.sessionInfo)
-    return this.unsubscribeFunc(id)
-  }
+  userSignedOut() {
+    cookie.save(TOKEN_COOKIE_NAME, null, { path: '/' })
+  },
 
-  unsubscribeFunc(id) {
-    return () => {
-      const idx = this.listeners.findIndex(l => l.id === id)
-      this.listeners.splice(idx, 1)
-    }
-  }
+  loadRefData(sessionInfo) {
+    const { loadRefData } = this.props
+    loadRefData(sessionInfo)
+  },
 
   render() {
     const { displaySignInForm } = this.props
@@ -87,7 +70,7 @@ class App extends Component {
         <Footer />
       </div>
     )
-  }
+  },
 
   renderChildren() {
     const { children } = this.props
@@ -97,7 +80,7 @@ class App extends Component {
       </div>
     )
   }
-}
+})
 
 App.propTypes = {
   sessionInfo: PropTypes.shape({
@@ -114,9 +97,11 @@ App.propTypes = {
 
 App.childContextTypes = {
   staticRefData: PropTypes.object,
-  getSessionInfo: PropTypes.func,
-  RefData: PropTypes.object,
-  addSessionInfoListener: PropTypes.func
+  RefData: PropTypes.object
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export { App }
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+  sessionListening(App)
+)

@@ -5,7 +5,7 @@ import { ProjectActions } from '../../actions'
 import { Permissions } from '../../constants'
 import ProjectListItem from './ProjectListItem'
 import AddProject from './AddProject'
-import { sessionAware } from '../hoc'
+import { sessionSubscriber } from '../hoc'
 
 const ProjectList = React.createClass({
 
@@ -98,4 +98,4 @@ export default connect(
     saveProject: (name, s) => dispatch(ProjectActions.saveNewProject(name)),
     deleteProject: (project, s) => dispatch(ProjectActions.deleteProject(project, s)),
   })
-)(sessionAware(ProjectList))
+)(sessionSubscriber(ProjectList))

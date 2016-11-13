@@ -12,6 +12,10 @@ const ActionTypes = {
 
   MENU_SELECTED: 'MENU_SELECTED',
 
+// refdata
+  REF_DATA_LOADED: 'REF_DATA_LOADED',
+
+
 // session
   DISPLAY_SIGN_IN: 'DISPLAY_SIGN_IN',
   SIGN_IN: 'SIGN_IN',

@@ -1,9 +1,25 @@
-import { combineReducers } from 'redux'
-import locations from './locations'
-import resources from './resources'
+import { ActionTypes } from '../constants'
 
-const staticReducer = combineReducers({
-  locations, resources, locationRates: (s={}) => s, contractTypes: (c={}) => c
-})
+const DEFAULT_STATE = {locations: {}, resources: {}}
 
-export default staticReducer
+const keyById = (c) => {
+  const rv = {}
+  c.forEach(e => rv[e._id] = e)
+  return rv
+}
+
+const staticRefData = (state = DEFAULT_STATE, action) => {
+
+  switch (action.type) {
+  case ActionTypes.REF_DATA_LOADED:
+    return {
+      locations: keyById(action.payload.locations),
+      resources: keyById(action.payload.resources),
+      contractTypes: keyById(action.payload.contractTypes)
+    }
+  default:
+    return state
+  }
+}
+
+export default staticRefData

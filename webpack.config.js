@@ -1,10 +1,9 @@
 var path = require('path')
 var webpack = require('webpack')
+var environment = process.env.NODE_ENV
 // var ExtractTextPlugin = require('extract-text-webpack-plugin')
 
-const environment=process.env.NODE_ENV
-
-console.log(environment)
+if (!environment) environment = 'dev'
 const config = {
   devtool: 'inline-source-map',
   entry: [
@@ -60,19 +59,18 @@ const config = {
 
 }
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'dev') {
+  config.plugins.push(new webpack.HotModuleReplacementPlugin())
+  config.entry.unshift('webpack-hot-middleware/client')
+}
+else { // non-dev
   config.plugins.unshift(new webpack.optimize.DedupePlugin())
   config.plugins.push(new webpack.optimize.UglifyJsPlugin())
 
   // remove react plugin in production
-  config.module.loaders[0].query.presets.splice(0, 1, 'react')
-  config.plugins.push(new webpack.DefinePlugin({'process.env': {'NODE_ENV': '"production"'}}))
+  config.module.loaders[1].query.presets.splice(0, 1, 'react')
 }
-else {
-  config.plugins.push(new webpack.HotModuleReplacementPlugin())
 
-  config.entry.unshift('webpack-hot-middleware/client')
-}
 // this doesn't seem to work - can't get dynamic variable process.env.NODE_ENV into define plugin as string literal
 if (process.env.NODE_ENV === 'production')
   config.plugins.push(new webpack.DefinePlugin({'process.env': {'NODE_ENV': '"production"'}}))

@@ -1,7 +1,7 @@
 
 import { ServerAPI, ProjectAPI, BudgetAPI, StaticData } from '.'
 
-const initialState = () => ({
+const localInitialState = ({
   global: {
     remoteActions: [],
     dialog: {}//{
@@ -21,28 +21,6 @@ const initialState = () => ({
   },
   model: {},
   staticRefData: {
-    locationRates: {
-      'London': {
-        'M': 600,
-        'P': 350,
-        'C': 500
-      },
-      'UK': {
-        'M': 500,
-        'P': 300,
-        'C': 400
-      },
-      'IN': {
-        'M': 300,
-        'P': 150,
-        'C': 300
-      },
-      defaults: {
-        'M': 500,
-        'P': 300,
-        'C': 400
-      }
-    },
     contractTypes: [
       {code: 'M', description: 'Managed Services'},
       {code: 'P', description: 'Permanent'},
@@ -55,27 +33,27 @@ const initialState = () => ({
   }
 })
 
-const keyById = (c) => {
-  const rv = {}
-  c.forEach(e => rv[e._id] = e)
-  return rv
-}
+// const keyById = (c) => {
+//   const rv = {}
+//   c.forEach(e => rv[e._id] = e)
+//   return rv
+// }
+//
+//
+// const getInitialState = () => {
+//
+//   return new Promise((fulfill, reject) => {
+//     StaticData.getAll().then( ({response: rd}) => {
+//       const state = Object.assign(is, {
+//         model: Object.assign(is.model, {}),
+//         staticRefData: {
+//           locations: keyById(rd.locations),
+//           resources: keyById(rd.resources),
+//         },
+//       })
+//       fulfill(state)
+//     })
+//   })
+// }
 
-export function getInitialState() {
-
-  return new Promise((fulfill, reject) => {
-    StaticData.getResources().then( ({response: r}) => {
-      StaticData.getLocations().then( ({response: l}) => {
-        const is = initialState()
-        const state = Object.assign(is, {
-          model: Object.assign(is.model, {}),
-          staticRefData: Object.assign(is.staticRefData, {
-            locations: keyById(l),
-            resources: keyById(r),
-          }),
-        })
-        fulfill(state)
-      })
-    })
-  })
-}
+export { localInitialState }

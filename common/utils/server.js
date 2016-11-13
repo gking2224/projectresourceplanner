@@ -15,21 +15,28 @@ const constructUrl = (service, resource, params) => {
   return url
 }
 
-const callService = ({service, sessionInfo, resource, xhr = new XMLHttpRequest.XMLHttpRequest(), method = 'GET', body = false, params = {}}) => {
+const getXhrRequest = (service, xhr) => {
+  if (xhr) return xhr
+  else return envConfig().services[service].xhr
+}
+
+const callService = ({service, sessionInfo, resource, xhr, method = 'GET', body = false, params = {}}) => {
   return new Promise((fulfill, reject) => {
     const url = constructUrl(service, resource, params)
+    const xhrRequest = getXhrRequest(service, xhr)
     console.log(`${method}: ${url}`)
-    body && console.log(body)
-    xhr.open(method, url, true)
-    xhr.setRequestHeader('Accept', 'application/json')
-    xhr.setRequestHeader('Content-Type', 'application/json')
+    xhrRequest.open(method, url, true)
+    xhrRequest.setRequestHeader('Accept', 'application/json')
+    xhrRequest.setRequestHeader('Content-Type', 'application/json')
+    // xhrRequest.setRequestHeader('X-CSRF-TOKEN', 'application/json')
+    xhrRequest.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
     if (sessionInfo && sessionInfo.securityToken) {
-      xhr.setRequestHeader('Authentication', sessionInfo.securityToken)
+      xhrRequest.setRequestHeader('Authentication', sessionInfo.securityToken)
     }
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === xhr.DONE) {
-        const status = xhr.status
-        const responseText = xhr.responseText
+    xhrRequest.onreadystatechange = () => {
+      if (xhrRequest.readyState === xhrRequest.DONE) {
+        const status = xhrRequest.status
+        const responseText = xhrRequest.responseText
         const response = responseText ? JSON.parse(responseText) : null
         if (status >= 200 && status < 300) {
           setTimeout(() => fulfill({status, response}), 300)
@@ -39,7 +46,7 @@ const callService = ({service, sessionInfo, resource, xhr = new XMLHttpRequest.X
         }
       }
     }
-    xhr.send(body && JSON.stringify(body))
+    xhrRequest.send(body && JSON.stringify(body))
   })
 }
 export const Server = {
