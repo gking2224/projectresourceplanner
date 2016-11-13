@@ -43,6 +43,11 @@ dependencies {
 awsplugin {
     region = "eu-west-1"
 }
+buildDockerImage.doFirst {
+    addFile 'public'
+    addFile 'index.js'
+    addFile 'server.js'
+}
 /*
 project.task("ecrGetLogin", type: me.gking2224.awsplugin.task.ecr.GetLogin) {
     registryId = project.dockerEcrRegistryId
