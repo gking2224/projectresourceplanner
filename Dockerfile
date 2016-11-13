@@ -27,8 +27,8 @@ COPY public $APP_DIR/public
 #COPY server $APP_DIR/server
 #COPY package.json $APP_DIR
 #COPY webpack.config.js $APP_DIR
-COPY index.js $APP_DIR
-COPY server.js $APP_DIR
+COPY index.js $APP_DIR/index.js
+COPY server.js $APP_DIR/server.js
 #COPY .babelrc $APP_DIR
 #COPY .babelignore $APP_DIR
 
