@@ -38,29 +38,29 @@ const allConfig = {
     services: {
       projects: {
         protocol: 'http',
-        host: 'http://projectms-dev-next.gking2224.me',
+        host: 'projectms-dev-next.gking2224.me',
         port: 80,
         contextRoot: 'project',
         xhr: new XMLHttpRequest.XMLHttpRequest()
       },
       budgets: {
         protocol: 'http',
-        host: 'http://budgetms-dev-next.gking2224.me',
+        host: 'budgetms-dev-next.gking2224.me',
         port: 80,
         contextRoot: 'budget',
         xhr: new XMLHttpRequest.XMLHttpRequest()
       },
       refdata: {
         protocol: 'http',
-        host: 'http://refdatams-dev-next.gking2224.me',
+        host: 'refdatams-dev-next.gking2224.me',
         port: 80,
         contextRoot: 'refdata',
         xhr: new XMLHttpRequest.XMLHttpRequest()
       },
       security: {
-        protocol: 'http',
-        host: 'https://securityms-dev-next.gking2224.me',
-        port: 80,
+        protocol: 'https',
+        host: 'securityms-dev-next.gking2224.me',
+        port: 443,
         contextRoot: 'security',
         xhr: new XMLHttpRequest.XMLHttpRequest()
       },
