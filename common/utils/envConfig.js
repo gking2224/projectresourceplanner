@@ -59,7 +59,7 @@ const allConfig = {
       },
       security: {
         protocol: 'http',
-        host: 'http://securityms-dev-next.gking2224.me',
+        host: 'https://securityms-dev-next.gking2224.me',
         port: 80,
         contextRoot: 'security',
         xhr: new XMLHttpRequest.XMLHttpRequest()
