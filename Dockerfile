@@ -11,7 +11,7 @@ MAINTAINER Graham King <gking2224@gmail.com>
 
 # environment variables
 ENV APP_DIR=$WORK_DIR/app
-ENV env=dev
+ENV ENVIRONMENT=dev
 
 # create directories
 
@@ -29,4 +29,4 @@ RUN ln -s /tmp/node_modules $APP_DIR/node_modules
 RUN npm set progress=false
 
 # executable
-CMD NODE_ENV=$env node $APP_DIR/server.js
+CMD NODE_ENV=$ENVIRONMENT node $APP_DIR/server.js
