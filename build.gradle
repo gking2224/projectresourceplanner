@@ -44,9 +44,9 @@ awsplugin {
     region = "eu-west-1"
 }
 buildDockerImage.doFirst {
-    addFile 'public'
-    addFile 'index.js'
-    addFile 'server.js'
+    addFile 'public', '\$APP_DIR'
+    addFile 'index.js', '\$APP_DIR'
+    addFile 'server.js', '\$APP_DIR'
 }
 /*
 project.task("ecrGetLogin", type: me.gking2224.awsplugin.task.ecr.GetLogin) {
