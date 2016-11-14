@@ -30,6 +30,7 @@ apply plugin: 'me.gking2224.msplugin'
 
 microservice {
     taskDefinitionPrefix "prp"
+    instanceService "prp"
 }
 repositories {
     mavenLocal()
